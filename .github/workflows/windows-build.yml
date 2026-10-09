@@ -1,0 +1,18 @@
+name: Windows build
+on:
+  push:
+    branches: [master, feature/phase-0-stabilization]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore Symbolic11.sln
+      - name: Build
+        run: dotnet build Symbolic11.sln --configuration Release --no-restore
