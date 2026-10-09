@@ -13,6 +13,9 @@ namespace Symbolic11.Pages;
 /// </summary>
 public partial class CreateLink : Page
 {
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool CreateHardLink(string newFileName, string existingFileName, IntPtr securityAttributes);
     public string linkFileType = "folder";
     public CreateLink()
     {
@@ -194,9 +197,7 @@ public partial class CreateLink : Page
                 if (isFile ? !File.Exists(targetPath) : !Directory.Exists(targetPath))
                     throw new FileNotFoundException("The selected destination does not exist.", targetPath);
 
-                if (File.Exists(linkPath) || Directory.Exists(linkPath) ||
-                    (File.GetAttributes(linkFolderPath) & FileAttributes.ReparsePoint) != 0 &&
-                    Path.GetFullPath(linkPath) == Path.GetFullPath(linkFolderPath))
+                if (File.Exists(linkPath) || Directory.Exists(linkPath))
                     throw new IOException("The link path already exists or is invalid.");
 
                 switch (SymbolicType.Text)
@@ -208,7 +209,7 @@ public partial class CreateLink : Page
                         Directory.CreateSymbolicLink(linkPath, targetPath);
                         break;
                     case "Hard Link" when isFile:
-                        File.CreateHardLink(linkPath, targetPath);
+                        if (!CreateHardLink(linkPath, targetPath, IntPtr.Zero))\n                            throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
                         break;
                     case "Junction Link" when isFolder:
                         // Junctions use the Windows mklink /J operation; invoke without a command shell
