@@ -1,37 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>sym11-icon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
     <PublishSingleFile>true</PublishSingleFile>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <SelfContained>false</SelfContained>
     <ImplicitUsings>enable</ImplicitUsings>
-	<UseWindowsForms>true</UseWindowsForms>
-	<UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="sym11-icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="WPF-UI" Version="3.0.5" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageReference Include="System.Management.Automation" Version="7.2.23" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="Assets\wpfui-icon-256.png" />
     <None Remove="Assets\wpfui-icon-1024.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Assets\sym11-icon-256.png" />
     <Resource Include="Assets\sym11-icon-1024.png" />
   </ItemGroup>
-
 </Project>

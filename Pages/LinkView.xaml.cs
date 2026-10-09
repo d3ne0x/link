@@ -144,7 +144,7 @@ public partial class LinkView : Page
         RecurseSubdirectories = true,
         MaxRecursionDepth = 5,
     };
-    private CancellationTokenSource cancellationTokenSource;
+    private CancellationTokenSource? cancellationTokenSource;
     private Task? searchTask;
     public LinkView()
     {
@@ -156,90 +156,91 @@ public partial class LinkView : Page
         linkDataGrid.Focus();
     }
 
-    private async void performSearchOnPath(CancellationToken cToken)
+    private async Task PerformSearchAsync(string root, CancellationToken token)
     {
-        string pathToSearch = currentSearchPath;
-
-        var Files = Directory.EnumerateFileSystemEntries(pathToSearch, "*", enumerationOptions);
-        Dispatcher.Invoke(() =>
+        try
         {
-            links.Clear();
-        });
-
-        foreach (var filePath in Files)
-        {
-            if (cToken.IsCancellationRequested)
+            await Dispatcher.InvokeAsync(() => links.Clear());
+            var options = new EnumerationOptions
             {
-                Debug.WriteLine("ct.IsCancellationRequested 1");
-                return;
-            }
-            Debug.WriteLine("Searching: " + filePath);
+                IgnoreInaccessible = true,
+                AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                RecurseSubdirectories = true,
+                MaxRecursionDepth = 5,
+                ReturnSpecialDirectories = false
+            };
+            await Task.Run(async () =>
+            {
+                foreach (string path in Directory.EnumerateFileSystemEntries(root, "*", options))
+                {
+                    token.ThrowIfCancellationRequested();
+                    try
+                    {
+                        var attributes = File.GetAttributes(path);
+                        bool isDirectory = attributes.HasFlag(FileAttributes.Directory);
+                        bool isReparse = attributes.HasFlag(FileAttributes.ReparsePoint);
+                        bool isShortcut = !isDirectory && path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase);
+                        if (!isReparse && !isShortcut) continue;
+                        string? target = isShortcut ? GetShortcutTarget(path)
+                            : isDirectory ? new DirectoryInfo(path).LinkTarget : new FileInfo(path).LinkTarget;
+                        string type = isShortcut ? "Shortcut" : isDirectory ? "Directory Link" : "File Link";
+                        string? resolved = target;
+                        if (!string.IsNullOrWhiteSpace(target) && !Path.IsPathFullyQualified(target))
+                            resolved = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path)!, target));
+                        bool exists = !string.IsNullOrWhiteSpace(resolved) &&
+                            (File.Exists(resolved) || Directory.Exists(resolved));
+                        var item = new Link { Source = path, Type = type, Target = target ?? "",
+                            Result = exists };
+                        await Dispatcher.InvokeAsync(() =>
+                        {
+                            links.Add(item);
+                            currentSearchDirectory.Text = path;
+                        });
+                    }
+                    catch (IOException) { }
+                    catch (UnauthorizedAccessException) { }
+                }
+            }, token);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            await Dispatcher.InvokeAsync(() =>
+                System.Windows.MessageBox.Show(ex.Message, "Search failed",
+                    MessageBoxButton.OK, MessageBoxImage.Error));
+        }
+        finally
+        {
             await Dispatcher.InvokeAsync(() =>
             {
-                currentSearchDirectory.Text = filePath;
+                searchButton.Content = "Search";
+                currentSearchDirectory.Text = "";
+                searchTask = null;
+                cancellationTokenSource?.Dispose();
+                cancellationTokenSource = null;
             });
-
-            FileInfo fileInfo = new FileInfo(filePath);
-            var Attributes = fileInfo.Attributes;
-
-            string linkSource = filePath;
-            string linkType = "";
-            string linkTarget = "???";
-            bool linkResult = false;
-
-            if (Attributes.HasFlag(FileAttributes.ReparsePoint))
-            {
-                linkType = "SymLink";
-                linkTarget = fileInfo.LinkTarget;
-                linkResult = Directory.Exists(linkTarget);
-            }
-            else if (fileInfo.Extension == ".lnk")
-            {
-                linkType = "Shortcut";
-                linkTarget = GetShortcutTarget(filePath);
-                linkResult = (linkTarget != null);
-            }
-
-            if (linkType != "")
-            {
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    links.Add(new Link
-                    {
-                        Type = linkType,
-                        Source = filePath,
-                        Target = linkTarget,
-                        Result = linkResult
-                    });
-                });
-            }
         }
-        await Dispatcher.InvokeAsync(() => {
-            searchButton.Content = "Search";
-            currentSearchDirectory.Text = "";
-        });
     }
 
-    private void searchButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void searchButton_Click(object sender, RoutedEventArgs e)
     {
-        Debug.WriteLine(searchTask == null);
-
-        if (searchTask == null)
+        if (searchTask != null)
         {
-            // Start the command
-            cancellationTokenSource = new CancellationTokenSource();
-            searchTask = Task.Run(() => performSearchOnPath(cancellationTokenSource.Token), cancellationTokenSource.Token);
-            searchButton.Content = "Cancel";
+            cancellationTokenSource?.Cancel();
+            searchButton.Content = "Stopping...";
+            searchButton.IsEnabled = false;
+            _ = searchTask.ContinueWith(_ => Dispatcher.Invoke(() => searchButton.IsEnabled = true));
+            return;
         }
-        else
+        if (!Directory.Exists(currentSearchPath))
         {
-            searchButton.Content = "Search";
-            currentSearchDirectory.Text = "";
-            cancellationTokenSource.Cancel();
-            searchTask = null;
+            System.Windows.MessageBox.Show("Select an existing folder.", "Invalid search path");
+            return;
         }
+        cancellationTokenSource = new CancellationTokenSource();
+        searchButton.Content = "Cancel";
+        searchTask = PerformSearchAsync(currentSearchPath, cancellationTokenSource.Token);
     }
-
 
     private void changeSearchDirectory_Click(object sender, System.Windows.RoutedEventArgs e)
     {
@@ -287,36 +288,33 @@ public partial class LinkView : Page
 
     private void DeleteLink_Click(object sender, RoutedEventArgs e)
     {
-        if (DeleteLink.IsEnabled)
+        if (linkDataGrid.SelectedItem is not Link selected) return;
+        if (System.Windows.MessageBox.Show(
+            $"Remove this link only?\\n{selected.Source}\\n\\nThe target will not be deleted.",
+            "Confirm link deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+            != MessageBoxResult.Yes) return;
+
+        try
         {
-            Link selectedLink = (Link)linkDataGrid.SelectedItem;
-            bool deleted = false;
-
-            if (selectedLink.Type == "Shortcut")
-            {
-
-                if (File.Exists(selectedLink.Source))
-                {
-                    Debug.WriteLine("Deleting File:" + selectedLink.Source);
-                    File.Delete(selectedLink.Source);
-                    deleted = true;
-                }
-            }
-            else
-            {
-                if (Directory.Exists(selectedLink.Source))
-                {
-                    Debug.WriteLine("Deleting Directory:" + selectedLink.Source);
-                    Directory.Delete(selectedLink.Source);
-                    deleted = true;
-                }
-            }
-            if (deleted) {
-                Dispatcher.Invoke(() =>
-                {
-                    links.Remove(selectedLink);
-                });
-            }
+            string path = selected.Source;
+            FileAttributes attrs = File.GetAttributes(path);
+            bool directory = attrs.HasFlag(FileAttributes.Directory);
+            bool reparse = attrs.HasFlag(FileAttributes.ReparsePoint);
+            bool shortcut = !directory && path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase);
+            if (!reparse && !shortcut)
+                throw new IOException("The selected item is no longer a link. Nothing was deleted.");
+            if (shortcut && selected.Type != "Shortcut")
+                throw new IOException("The selected item has changed since the scan.");
+            if (reparse && selected.Type == "Shortcut")
+                throw new IOException("The selected item has changed since the scan.");
+            if (directory) Directory.Delete(path, false);
+            else File.Delete(path);
+            links.Remove(selected);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(ex.Message, "Link deletion failed",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
