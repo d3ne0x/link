@@ -16,6 +16,53 @@ public partial class CreateLink : Page
     [System.Runtime.InteropServices.DllImport("kernel32.dll", EntryPoint = "CreateHardLinkW", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
     [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
     private static extern bool CreateHardLink(string newFileName, string existingFileName, IntPtr securityAttributes);
+    // Junctions are directory reparse points. Set their target using FSCTL_SET_REPARSE_POINT.
+    private const uint FsctlSetReparsePoint = 0x000900A4;
+    private const uint IoReparseTagMountPoint = 0xA0000003;
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool DeviceIoControl(Microsoft.Win32.SafeHandles.SafeFileHandle handle,
+        uint controlCode, byte[] input, int inputSize, IntPtr output, int outputSize,
+        out int returned, IntPtr overlapped);
+
+    private static void CreateJunction(string linkPath, string targetPath)
+    {
+        string absoluteTarget = Path.GetFullPath(targetPath);
+        if (!Path.IsPathFullyQualified(absoluteTarget))
+            throw new ArgumentException("Junction target must be an absolute path.");
+        string substitute = @"\??\" + absoluteTarget;
+        byte[] substituteBytes = System.Text.Encoding.Unicode.GetBytes(substitute);
+        byte[] printBytes = System.Text.Encoding.Unicode.GetBytes(absoluteTarget);
+        int pathLength = substituteBytes.Length + 2 + printBytes.Length + 2;
+        byte[] buffer = new byte[16 + pathLength];
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt32LittleEndian(buffer.AsSpan(0, 4), IoReparseTagMountPoint);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(4, 2), checked((ushort)(8 + pathLength)));
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(8, 2), 0);
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(10, 2), checked((ushort)substituteBytes.Length));
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(12, 2), checked((ushort)(substituteBytes.Length + 2)));
+        System.Buffers.Binary.BinaryPrimitives.WriteUInt16LittleEndian(buffer.AsSpan(14, 2), checked((ushort)printBytes.Length));
+        Buffer.BlockCopy(substituteBytes, 0, buffer, 16, substituteBytes.Length);
+        Buffer.BlockCopy(printBytes, 0, buffer, 18 + substituteBytes.Length, printBytes.Length);
+
+        Directory.CreateDirectory(linkPath);
+        try
+        {
+            using var handle = System.IO.File.OpenHandle(linkPath, FileMode.Open, FileAccess.Write,
+                FileShare.ReadWrite | FileShare.Delete, FileOptions.BackupSemantics);
+            if (!DeviceIoControl(handle, FsctlSetReparsePoint, buffer, buffer.Length,
+                IntPtr.Zero, 0, out _, IntPtr.Zero))
+                throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
+        }
+        catch
+        {
+            // Only remove the empty directory we just created.
+            if (Directory.Exists(linkPath) &&
+                (File.GetAttributes(linkPath) & FileAttributes.ReparsePoint) == 0)
+                Directory.Delete(linkPath, false);
+            throw;
+        }
+    }
+
     public string linkFileType = "folder";
     public CreateLink()
     {
@@ -209,12 +256,13 @@ public partial class CreateLink : Page
                         Directory.CreateSymbolicLink(linkPath, targetPath);
                         break;
                     case "Hard Link" when isFile:
-                        if (!CreateHardLink(linkPath, targetPath, IntPtr.Zero))\n                            throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
+                        if (!CreateHardLink(linkPath, targetPath, IntPtr.Zero))
+                            throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
                         break;
                     case "Junction Link" when isFolder:
                         // Junctions use the Windows mklink /J operation; invoke without a command shell
                         // only after paths have been validated in the dedicated junction service.
-                        throw new NotSupportedException("Junction creation is temporarily disabled until a safe native implementation is available.");
+                        CreateJunction(linkPath, targetPath);
                     default:
                         throw new ArgumentException("The selected link type does not match the file type.");
                 }
