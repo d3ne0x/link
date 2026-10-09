@@ -175,52 +175,58 @@ public partial class CreateLink : Page
 
             string targetPath = DestinationPath.Text;
 
-            // Determine additional arguments based on conditions
-            string additionalArguments = "";
-
-            if (SymbolicType.Text == "Symbolic Link" && linkFileType == "folder")
-            {
-                additionalArguments = "/D";
-            }
-            else if (SymbolicType.Text == "Hard Link" && linkFileType == "file")
-            {
-                additionalArguments = "/H";
-                linkPath += System.IO.Path.GetExtension(targetPath);
-            }
-            else if (SymbolicType.Text == "Junction Link" && linkFileType == "folder")
-            {
-                additionalArguments = "/J";
-            }
-
             try
             {
-                using (Process process = new Process())
+                if (linkName != Path.GetFileName(linkName) ||
+                    linkName is "." or ".." ||
+                    linkName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 ||
+                    linkName.EndsWith(' ') || linkName.EndsWith('.'))
+                    throw new ArgumentException("Enter a valid file or folder name.");
+
+                if (!Directory.Exists(linkFolderPath))
+                    throw new DirectoryNotFoundException("The link parent folder does not exist.");
+
+                bool isFile = linkFileType == "file";
+                bool isFolder = linkFileType == "folder";
+                if (!isFile && !isFolder)
+                    throw new ArgumentException("Select a file or folder type.");
+
+                if (isFile ? !File.Exists(targetPath) : !Directory.Exists(targetPath))
+                    throw new FileNotFoundException("The selected destination does not exist.", targetPath);
+
+                if (File.Exists(linkPath) || Directory.Exists(linkPath) ||
+                    (File.GetAttributes(linkFolderPath) & FileAttributes.ReparsePoint) != 0 &&
+                    Path.GetFullPath(linkPath) == Path.GetFullPath(linkFolderPath))
+                    throw new IOException("The link path already exists or is invalid.");
+
+                switch (SymbolicType.Text)
                 {
-                    process.StartInfo.FileName = "cmd.exe";
-                    process.StartInfo.RedirectStandardInput = true;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
-                    process.Start();
-
-                    // Run the mklink command with additional arguments
-                    process.StandardInput.WriteLine($"mklink {additionalArguments} \"{linkPath}\" \"{targetPath}\"");
-                    process.StandardInput.WriteLine("exit");
-
-                    process.WaitForExit();
+                    case "Symbolic Link" when isFile:
+                        File.CreateSymbolicLink(linkPath, targetPath);
+                        break;
+                    case "Symbolic Link" when isFolder:
+                        Directory.CreateSymbolicLink(linkPath, targetPath);
+                        break;
+                    case "Hard Link" when isFile:
+                        File.CreateHardLink(linkPath, targetPath);
+                        break;
+                    case "Junction Link" when isFolder:
+                        // Junctions use the Windows mklink /J operation; invoke without a command shell
+                        // only after paths have been validated in the dedicated junction service.
+                        throw new NotSupportedException("Junction creation is temporarily disabled until a safe native implementation is available.");
+                    default:
+                        throw new ArgumentException("The selected link type does not match the file type.");
                 }
 
-                // Symbolic link created successfully
                 InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Success;
-                InfoBar.Title = "Link " + linkName + " Created!";
-                InfoBar.Message = "";
+                InfoBar.Title = "Link created";
+                InfoBar.Message = linkPath;
                 InfoBar.IsOpen = true;
-                Debug.WriteLine($"mklink {additionalArguments} \"{linkPath}\" \"{targetPath}\"");
             }
             catch (Exception ex)
             {
-                // An error occurred
                 InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Error;
-                InfoBar.Title = "Error Creating Link";
+                InfoBar.Title = "Link creation failed";
                 InfoBar.Message = ex.Message;
                 InfoBar.IsOpen = true;
             }
