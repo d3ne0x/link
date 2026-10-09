@@ -25,6 +25,9 @@ public partial class CreateLink : Page
         uint controlCode, byte[] input, int inputSize, IntPtr output, int outputSize,
         out int returned, IntPtr overlapped);
 
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+    private static extern Microsoft.Win32.SafeHandles.SafeFileHandle OpenDirectoryHandle(string name, uint access, uint share, IntPtr security, uint disposition, uint flags, IntPtr template);
+
     private static void CreateJunction(string linkPath, string targetPath)
     {
         string absoluteTarget = Path.GetFullPath(targetPath);
@@ -47,8 +50,9 @@ public partial class CreateLink : Page
         Directory.CreateDirectory(linkPath);
         try
         {
-            using var handle = System.IO.File.OpenHandle(linkPath, FileMode.Open, FileAccess.Write,
-                FileShare.ReadWrite | FileShare.Delete, FileOptions.BackupSemantics);
+            using var handle = OpenDirectoryHandle(linkPath, 0x40000000, 7, IntPtr.Zero, 3, 0x02000000, IntPtr.Zero);
+            if (handle.IsInvalid)
+                throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
             if (!DeviceIoControl(handle, FsctlSetReparsePoint, buffer, buffer.Length,
                 IntPtr.Zero, 0, out _, IntPtr.Zero))
                 throw new System.ComponentModel.Win32Exception(System.Runtime.InteropServices.Marshal.GetLastWin32Error());
