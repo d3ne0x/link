@@ -19,5 +19,5 @@ public partial class MainWindow : Window
     private void Manage_Click(object sender, RoutedEventArgs e) => NavigateManage();
     private void Settings_Click(object sender, RoutedEventArgs e) => NavigateSettings();
     private void About_Click(object sender, RoutedEventArgs e) =>
-        MessageBox.Show("LinkCraft — Create • Manage • Simplify Links\nPhase 1 preview.\nBuilt on Symbolic11.", "About LinkCraft");
+        System.Windows.MessageBox.Show("LinkCraft — Create • Manage • Simplify Links\nPhase 1 preview.\nBuilt on Symbolic11.", "About LinkCraft");
 }
