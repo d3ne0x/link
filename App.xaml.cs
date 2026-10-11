@@ -3,7 +3,7 @@ using System.Windows.Threading;
 
 namespace Symbolic11;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
