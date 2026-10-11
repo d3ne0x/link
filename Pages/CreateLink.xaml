@@ -132,7 +132,7 @@
             </Grid.RowDefinitions>
             <Label Grid.Row="0"
                    x:Name="LinkText"
-                   Content="Link Folder"
+                   Content="Link Location (parent folder)"
                    Height="20"
                    Margin="5,0,0,0"
                    FontFamily="{StaticResource SegoueUIVariable}"
@@ -140,7 +140,7 @@
                    Visibility="{Binding IsChecked, ElementName=HelpToggleButton, Converter={StaticResource InverseBoolToVisibility}}"
                    VerticalAlignment="Bottom" />
             <Label Grid.Row="0"
-                   Content="The link will be created at:"
+                   Content="Choose the parent folder where the new link will be created:"
                    Height="20"
                    Margin="5,0,0,0"
                    FontFamily="{StaticResource SegoueUIVariable}"
@@ -172,7 +172,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0"
-                       Content="It will link to:"
+                       Content="Choose the existing file or folder that the link points to:"
                        Height="20"
                        Margin="5,15,0,0"
                        FontFamily="{StaticResource SegoueUIVariable}"
@@ -181,7 +181,7 @@
                        FontWeight="Bold" />
                 <Label Grid.Row="0"
                        x:Name="DestinationText"
-                       Content="Destination Folder"
+                       Content="Target Folder (existing)"
                        Height="20"
                        Margin="5,15,0,0"
                        FontFamily="{StaticResource SegoueUIVariable}"
