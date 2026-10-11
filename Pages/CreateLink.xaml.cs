@@ -1,5 +1,5 @@
 using System.IO;
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
@@ -94,12 +94,12 @@ public partial class CreateLink : Page
         const string developerModeKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock";
         const string developerModeValue = "AllowDevelopmentWithoutDevLicense";
 
-        using (RegistryKey key = Registry.LocalMachine.OpenSubKey(developerModeKey))
+        using (RegistryKey? key = Registry.LocalMachine.OpenSubKey(developerModeKey))
         {
             if (key != null)
             {
-                object value = key.GetValue(developerModeValue);
-                if (value != null && (int)value == 1)
+                object? value = key.GetValue(developerModeValue);
+                if (value is int enabled && enabled == 1)
                 {
                     return true;
                 }
@@ -290,9 +290,9 @@ public partial class CreateLink : Page
 
     private void SymbolicType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        string? SymbolicTypeText = SymbolicType.SelectedItem.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
+        string? SymbolicTypeText = SymbolicType.SelectedItem?.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
-        if (SymbolicTypeText.Equals(HardLink.Content))
+        if (string.Equals(SymbolicTypeText, HardLink.Content?.ToString(), StringComparison.Ordinal))
         {
             LinkText.Content = "Link File";
         }
