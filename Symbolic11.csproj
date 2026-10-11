@@ -12,6 +12,7 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="tests\\**\\*.cs" />
     <Content Include="sym11-icon.ico" />
     <PackageReference Include="WPF-UI" Version="3.0.5" />
   </ItemGroup>
