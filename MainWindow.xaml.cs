@@ -1,19 +1,23 @@
-﻿using System.Windows;
+using System.Windows;
 using Symbolic11.Pages;
-using Wpf.Ui.Controls;
 
 namespace Symbolic11;
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow {
 
-    public MainWindow() {
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
         InitializeComponent();
-
+        Workspace.Navigate(new HomePage(NavigateCreate, NavigateManage, NavigateSettings));
     }
 
-    private void RootNavigation_Loaded(object sender, RoutedEventArgs e) {
-        RootNavigation.Navigate(typeof(CreateLink));
-    }
+    private void NavigateCreate() => Workspace.Navigate(new CreateLink());
+    private void NavigateManage() => Workspace.Navigate(new LinkView());
+    private void NavigateSettings() => Workspace.Navigate(new SettingsPage());
+    private void Home_Click(object sender, RoutedEventArgs e) => Workspace.Navigate(new HomePage(NavigateCreate, NavigateManage, NavigateSettings));
+    private void Create_Click(object sender, RoutedEventArgs e) => NavigateCreate();
+    private void Manage_Click(object sender, RoutedEventArgs e) => NavigateManage();
+    private void Settings_Click(object sender, RoutedEventArgs e) => NavigateSettings();
+    private void About_Click(object sender, RoutedEventArgs e) =>
+        System.Windows.MessageBox.Show("LinkCraft — Create • Manage • Simplify Links\nPhase 1 preview.\nBuilt on Symbolic11.", "About LinkCraft");
 }
