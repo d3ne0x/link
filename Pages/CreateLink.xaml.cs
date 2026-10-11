@@ -121,7 +121,7 @@ public partial class CreateLink : Page
         {
             case "File":
                 linkFileType = "file";
-                DestinationText.Content = "Destination File";
+                DestinationText.Content = "Target File (existing)";
                 HardLink.IsEnabled = true;
                 JunctionLink.IsEnabled = false;
                 if (SymbolicType.Text.Equals(JunctionLink.Content))
@@ -131,7 +131,7 @@ public partial class CreateLink : Page
                 break;
             case "Folder":
                 linkFileType = "folder";
-                DestinationText.Content = "Destination Folder";
+                DestinationText.Content = "Target Folder (existing)";
                 HardLink.IsEnabled = false;
                 JunctionLink.IsEnabled = true;
                 if (SymbolicType.Text.Equals(HardLink.Content))
@@ -294,11 +294,11 @@ public partial class CreateLink : Page
 
         if (string.Equals(SymbolicTypeText, HardLink.Content?.ToString(), StringComparison.Ordinal))
         {
-            LinkText.Content = "Link File";
+            LinkText.Content = "Link Location (parent folder)";
         }
         else if (LinkText != null)
         {
-            LinkText.Content = "Link Folder";
+            LinkText.Content = "Link Location (parent folder)";
         }
     }
 }
