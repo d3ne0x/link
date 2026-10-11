@@ -1,52 +1,92 @@
 <Page x:Class="Symbolic11.Pages.HomePage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Background="#F5F8FD" Title="Home">
-    <Page.Resources>
-        <Style x:Key="CardButton" TargetType="Button">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="Margin" Value="0,0,16,0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinHeight" Value="170"/>
-        </Style>
-    </Page.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="32">
-            <Border Background="#0869EF" CornerRadius="14" Padding="28">
-                <StackPanel>
-                    <TextBlock Text="LinkCraft" FontSize="36" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock Text="Create • Manage • Simplify Links" FontSize="17" Foreground="#E3F0FF" Margin="0,10,0,0"/>
-                </StackPanel>
-            </Border>
-            <TextBlock Text="What would you like to do?" FontSize="23" FontWeight="SemiBold" Foreground="#172B46" Margin="0,30,0,20"/>
-            <UniformGrid Columns="3">
-                <Button Background="#0869EF" Style="{StaticResource CardButton}" Click="Create_Click">
-                    <StackPanel>
-                        <TextBlock Text="Create Link  →" FontSize="21" FontWeight="Bold"/>
-                        <TextBlock Text="Create symbolic links, hard links and junctions." FontSize="13" Margin="0,16,0,0" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Button>
-                <Button Background="#08A984" Style="{StaticResource CardButton}" Click="Manage_Click">
-                    <StackPanel>
-                        <TextBlock Text="Manage Links  →" FontSize="21" FontWeight="Bold"/>
-                        <TextBlock Text="Search, validate and safely manage links." FontSize="13" Margin="0,16,0,0" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Button>
-                <Button Background="#7644D9" Style="{StaticResource CardButton}" Click="Settings_Click">
-                    <StackPanel>
-                        <TextBlock Text="Settings  →" FontSize="21" FontWeight="Bold"/>
-                        <TextBlock Text="Configure application preferences." FontSize="13" Margin="0,16,0,0" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Button>
-            </UniformGrid>
-            <TextBlock Text="Quick Overview" FontSize="23" FontWeight="SemiBold" Foreground="#172B46" Margin="0,32,0,14"/>
-            <Border Background="White" CornerRadius="12" Padding="24" BorderBrush="#DCE5F1" BorderThickness="1">
-                <TextBlock Text="Link counts will appear after folder scanning. No system-wide totals are assumed." Foreground="#61728C" FontSize="15" TextWrapping="Wrap"/>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Background="#F5F8FD" Title="Home">
+ <Page.Resources>
+  <Style x:Key="ActionCard" TargetType="Button">
+   <Setter Property="Foreground" Value="White"/>
+   <Setter Property="BorderThickness" Value="0"/>
+   <Setter Property="Padding" Value="20"/>
+   <Setter Property="Margin" Value="0,0,12,0"/>
+   <Setter Property="Cursor" Value="Hand"/>
+   <Setter Property="MinHeight" Value="190"/>
+   <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+   <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+  </Style>
+  <Style x:Key="OverviewCard" TargetType="Border">
+   <Setter Property="Background" Value="#F4F9FF"/>
+   <Setter Property="BorderBrush" Value="#E3EBF6"/>
+   <Setter Property="BorderThickness" Value="1"/>
+   <Setter Property="CornerRadius" Value="10"/>
+   <Setter Property="Padding" Value="12"/>
+   <Setter Property="Margin" Value="0,0,10,0"/>
+  </Style>
+ </Page.Resources>
+ <ScrollViewer VerticalScrollBarVisibility="Auto">
+  <StackPanel Margin="22">
+   <Border CornerRadius="14" Padding="26" Height="170">
+    <Border.Background>
+     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#07316C" Offset="0"/>
+      <GradientStop Color="#0869EF" Offset="0.65"/>
+      <GradientStop Color="#6D9EF8" Offset="1"/>
+     </LinearGradientBrush>
+    </Border.Background>
+    <Grid>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="90"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+     <Border Width="72" Height="72" CornerRadius="18" Background="#3898FF" VerticalAlignment="Center">
+      <TextBlock Text="↗" FontSize="49" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+     </Border>
+     <StackPanel Grid.Column="1" VerticalAlignment="Center">
+      <TextBlock Text="LinkCraft" FontSize="38" FontWeight="Bold" Foreground="White"/>
+      <TextBlock Text="Create • Manage • Simplify Links" FontSize="18" Foreground="White" Margin="0,5,0,0"/>
+      <TextBlock Text="Easily create and manage symbolic links, hard links and junctions." FontSize="13" Foreground="#EAF3FF" Margin="0,12,0,0" TextWrapping="Wrap"/>
+     </StackPanel>
+    </Grid>
+   </Border>
+   <UniformGrid Columns="3" Margin="0,16,0,0">
+    <Button Style="{StaticResource ActionCard}" Click="Create_Click">
+     <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#2C8DFF" Offset="0"/><GradientStop Color="#0754C7" Offset="1"/></LinearGradientBrush></Button.Background>
+     <StackPanel>
+      <TextBlock Text="↗" FontSize="38" FontWeight="Bold"/>
+      <TextBlock Text="Create Link" FontSize="20" FontWeight="Bold" Margin="0,8,0,0"/>
+      <TextBlock Text="Launch the wizard to create a symbolic link, hard link or junction." TextWrapping="Wrap" FontSize="13" Margin="0,12,0,0"/>
+      <TextBlock Text="Continue  →" HorizontalAlignment="Right" FontWeight="SemiBold" Margin="0,16,0,0"/>
+     </StackPanel>
+    </Button>
+    <Button Style="{StaticResource ActionCard}" Click="Manage_Click">
+     <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#16C49A" Offset="0"/><GradientStop Color="#068D73" Offset="1"/></LinearGradientBrush></Button.Background>
+     <StackPanel>
+      <TextBlock Text="≡" FontSize="38" FontWeight="Bold"/>
+      <TextBlock Text="Manage Links" FontSize="20" FontWeight="Bold" Margin="0,8,0,0"/>
+      <TextBlock Text="View, search, validate and manage links on your system." TextWrapping="Wrap" FontSize="13" Margin="0,12,0,0"/>
+      <TextBlock Text="Continue  →" HorizontalAlignment="Right" FontWeight="SemiBold" Margin="0,16,0,0"/>
+     </StackPanel>
+    </Button>
+    <Button Style="{StaticResource ActionCard}" Margin="0" Click="Settings_Click">
+     <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#9464FF" Offset="0"/><GradientStop Color="#6635C7" Offset="1"/></LinearGradientBrush></Button.Background>
+     <StackPanel>
+      <TextBlock Text="⚙" FontSize="38" FontWeight="Bold"/>
+      <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Margin="0,8,0,0"/>
+      <TextBlock Text="Configure default options and preferences." TextWrapping="Wrap" FontSize="13" Margin="0,12,0,0"/>
+      <TextBlock Text="Continue  →" HorizontalAlignment="Right" FontWeight="SemiBold" Margin="0,16,0,0"/>
+     </StackPanel>
+    </Button>
+   </UniformGrid>
+   <Border Background="White" BorderBrush="#DCE5F1" BorderThickness="1" CornerRadius="12" Padding="16" Margin="0,16,0,0">
+    <StackPanel>
+     <DockPanel Margin="0,0,0,14">
+      <TextBlock Text="Quick Overview" FontSize="19" FontWeight="SemiBold" Foreground="#172B46"/>
+      <TextBlock DockPanel.Dock="Right" Text="Scan a folder in Manage Links to populate inventory" FontSize="12" Foreground="#61728C" HorizontalAlignment="Right"/>
+     </DockPanel>
+     <UniformGrid Columns="4">
+      <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="—" FontSize="24" FontWeight="Bold" Foreground="#0869EF"/><TextBlock Text="Symbolic Links" Foreground="#172B46"/></StackPanel></Border>
+      <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="—" FontSize="24" FontWeight="Bold" Foreground="#7644D9"/><TextBlock Text="Hard Links" Foreground="#172B46"/></StackPanel></Border>
+      <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="—" FontSize="24" FontWeight="Bold" Foreground="#2C8DFF"/><TextBlock Text="Junctions" Foreground="#172B46"/></StackPanel></Border>
+      <Border Style="{StaticResource OverviewCard}" Margin="0"><StackPanel><TextBlock Text="—" FontSize="24" FontWeight="Bold" Foreground="#08A568"/><TextBlock Text="Total Links" Foreground="#172B46"/></StackPanel></Border>
+     </UniformGrid>
+    </StackPanel>
+   </Border>
+  </StackPanel>
+ </ScrollViewer>
 </Page>
