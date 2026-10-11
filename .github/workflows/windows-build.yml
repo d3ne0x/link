@@ -16,3 +16,5 @@ jobs:
         run: dotnet restore Symbolic11.sln
       - name: Build
         run: dotnet build Symbolic11.sln --configuration Release --no-restore
+      - name: Windows link regression tests
+        run: dotnet run --project tests/Symbolic11.IntegrationTests/Symbolic11.IntegrationTests.csproj --configuration Release
