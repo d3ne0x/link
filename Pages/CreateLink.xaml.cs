@@ -1,3 +1,4 @@
+using System.IO;
 ﻿using System.Diagnostics;
 using System.Security.Principal;
 using System.Windows;
@@ -267,6 +268,7 @@ public partial class CreateLink : Page
                         // Junctions use the Windows mklink /J operation; invoke without a command shell
                         // only after paths have been validated in the dedicated junction service.
                         CreateJunction(linkPath, targetPath);
+                        break;
                     default:
                         throw new ArgumentException("The selected link type does not match the file type.");
                 }
