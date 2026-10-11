@@ -6,10 +6,10 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:pages="clr-namespace:Symbolic11.Pages"
                  Title="Symbolic11"
-                 Width="650"
-                 Height="420"
-                 MinWidth="650"
-                 MinHeight="420"
+                 Width="920"
+                 Height="600"
+                 MinWidth="760"
+                 MinHeight="500"
                  mc:Ignorable="d"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
@@ -38,16 +38,16 @@
                            IsBackButtonVisible="Collapsed"
                            Loaded="RootNavigation_Loaded">
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Create"
-                                       FontSize="9"
+                <ui:NavigationViewItem Content="Create Link"
+                                       FontSize="13"
                                        TargetPageType="{x:Type pages:CreateLink}"
                                        NavigationCacheMode="Enabled">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Home24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="View"
-                                       FontSize="9"
+                <ui:NavigationViewItem Content="Manage Links"
+                                       FontSize="13"
                                        TargetPageType="{x:Type pages:LinkView}"
                                        NavigationCacheMode="Enabled">
                     <ui:NavigationViewItem.Icon>

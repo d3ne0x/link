@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -136,6 +138,28 @@ public partial class LinkView : Page
     public string defaultSearchPath = "C:\\Users\\";
     public string currentSearchPath = "C:\\Users\\";
     ObservableCollection<Link> links = new ObservableCollection<Link>();
+    private ICollectionView? filteredLinks;
+
+    private bool MatchesFilter(object candidate)
+    {
+        if (candidate is not Link link) return false;
+        string term = FilterText.Text.Trim();
+        return term.Length == 0 || link.Source.Contains(term, StringComparison.OrdinalIgnoreCase)
+            || link.Target.Contains(term, StringComparison.OrdinalIgnoreCase)
+            || link.Type.Contains(term, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void UpdateResultCount()
+    {
+        if (filteredLinks == null) return;
+        ResultCountText.Text = $"{filteredLinks.Cast<object>().Count()} links";
+    }
+
+    private void FilterText_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        filteredLinks?.Refresh();
+        UpdateResultCount();
+    }
 
     private EnumerationOptions enumerationOptions = new EnumerationOptions
     {
@@ -151,7 +175,11 @@ public partial class LinkView : Page
         InitializeComponent();
         SearchPathText.Text = defaultSearchPath;
 
-        linkDataGrid.ItemsSource = links;
+        filteredLinks = CollectionViewSource.GetDefaultView(links);
+        filteredLinks.Filter = MatchesFilter;
+        linkDataGrid.ItemsSource = filteredLinks;
+        links.CollectionChanged += (_, _) => UpdateResultCount();
+        UpdateResultCount();
 
         linkDataGrid.Focus();
     }

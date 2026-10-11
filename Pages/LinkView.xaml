@@ -65,13 +65,19 @@
             <Grid Grid.Row="1"
                   Margin="5,0,5,5">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Grid>
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="4,10,4,0">
+                    <TextBlock Text="Filter results:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox x:Name="FilterText" Width="220" TextChanged="FilterText_TextChanged" ToolTip="Filter by source, target, or link type" />
+                    <TextBlock x:Name="ResultCountText" Text="0 links" VerticalAlignment="Center" Margin="16,0,0,0" />
+                </StackPanel>
+                <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -125,7 +131,7 @@
                              IsEnabled="False" />
                 </Grid>
 
-                <Button x:Name="DeleteLink"
+                <Button Grid.Row="1" x:Name="DeleteLink"
                         Click="DeleteLink_Click"
                         Margin="0,0,0,5"
                         Content="Delete"
