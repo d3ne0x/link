@@ -4,6 +4,10 @@
     <AssemblyName>Link</AssemblyName>
     <Product>XELO Link</Product>
     <Title>XELO Link</Title>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Description>Create and manage Windows symbolic links, hard links and junctions.</Description>
     <TargetFramework>net8.0-windows</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>sym11-icon.ico</ApplicationIcon>
