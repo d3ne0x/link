@@ -44,7 +44,7 @@
        <TextBlock Text="🔗" FontSize="32" HorizontalAlignment="Center"/>
        <TextBlock Text="Symbolic Link" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
        <TextBlock Text="Create a link to a file or folder.&#10;Can reference different volumes." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
-       <TextBlock Text="◉" Foreground="#0869EF" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+       <TextBlock x:Name="SymbolicRadio" Text="◉" Foreground="#0869EF" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
       </StackPanel>
      </Button>
      <Button x:Name="HardCard" Click="HardCard_Click" Style="{StaticResource Card}" Margin="0,0,10,0">
@@ -52,7 +52,7 @@
        <TextBlock Text="▤" FontSize="34" HorizontalAlignment="Center"/>
        <TextBlock Text="Hard Link" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
        <TextBlock Text="Files only.&#10;Must be on the same volume." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
-       <TextBlock Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+       <TextBlock x:Name="HardRadio" Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
       </StackPanel>
      </Button>
      <Button x:Name="JunctionCard" Click="JunctionCard_Click" Style="{StaticResource Card}">
@@ -60,7 +60,7 @@
        <TextBlock Text="▱" FontSize="34" HorizontalAlignment="Center"/>
        <TextBlock Text="Junction" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
        <TextBlock Text="Create a directory junction.&#10;For folders within Windows." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
-       <TextBlock Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+       <TextBlock x:Name="JunctionRadio" Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
       </StackPanel>
      </Button>
     </UniformGrid>
