@@ -18,10 +18,17 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
     # Clean the output: switching variants must not leave stale runtime binaries behind.
     if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Recurse -Force }
-    dotnet publish $project -c Release -r $Runtime --self-contained true "-p:PublishSingleFile=$($singleFile.ToString().ToLowerInvariant())" -p:IncludeNativeLibrariesForSelfExtract=false -o $output
+    dotnet publish $project -c Release -r $Runtime --self-contained true "-p:PublishSingleFile=$($singleFile.ToString().ToLowerInvariant())" -p:IncludeNativeLibrariesForSelfExtract=false -p:DebugType=None -p:DebugSymbols=false -o $output
     if ($LASTEXITCODE -ne 0) { throw 'Publish failed.' }
     $exe = Join-Path $output 'Link.exe'
     if (-not (Test-Path $exe)) { throw "Missing executable: $exe" }
+    # The apphost must carry the requestedExecutionLevel and DPI settings.
+    # This check is intentionally limited to the source manifest; Windows SDK
+    # mt.exe extraction is required to validate the final PE resource.
+    [xml]$manifest = Get-Content -LiteralPath (Join-Path $root 'app.manifest') -Raw
+    if ($manifest.OuterXml -notmatch 'asInvoker' -or $manifest.OuterXml -notmatch 'dpiAwareness') {
+        throw 'Application manifest is missing UAC or DPI-awareness configuration.'
+    }
     Write-Host "Release build ready ($BuildVariant): $exe"
     if (-not $singleFile) {
         $runtimeFiles = @(Get-ChildItem -LiteralPath $output -File)
