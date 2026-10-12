@@ -166,8 +166,8 @@ public partial class CreateLink : Page
 
         if (!IsDeveloperModeEnabled() && !IsUserAdministrator()) {
             InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Warning;
-            InfoBar.Title = "Insufficient Permissions";
-            InfoBar.Message = "The application is not running with administrative privileges. Link creation may fail.";
+            InfoBar.Title = "Symbolic link permissions";
+            InfoBar.Message = "Symbolic links may require Windows Developer Mode or the Create symbolic links privilege. Hard links and junctions normally do not require elevation.";
             InfoBar.IsOpen = true;
         }
 
@@ -377,10 +377,23 @@ public partial class CreateLink : Page
             {
                 InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Error;
                 InfoBar.Title = "Link creation failed";
-                InfoBar.Message = ex.Message;
+                InfoBar.Message = selectedLinkType == 0 && IsSymbolicLinkPrivilegeError(ex)
+                    ? "Windows blocked symbolic link creation. Enable Developer Mode in Windows Settings > System > For developers, then try again."
+                    : ex.Message;
                 InfoBar.IsOpen = true;
             }
         }
+    }
+
+    private static bool IsSymbolicLinkPrivilegeError(Exception error)
+    {
+        for (Exception? current = error; current != null; current = current.InnerException)
+        {
+            if (current.HResult == unchecked((int)0x80070522)) return true;
+            if (current is System.ComponentModel.Win32Exception native && native.NativeErrorCode == 1314)
+                return true;
+        }
+        return false;
     }
 
     private string GetSelectedLinkTypeName() => selectedLinkType switch
