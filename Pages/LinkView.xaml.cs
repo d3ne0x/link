@@ -114,6 +114,8 @@ public partial class LinkView : Page
 
     public class Link
     {
+        public string Name => Path.GetFileName(Source.TrimEnd(Path.DirectorySeparatorChar));
+        public string Status => Result ? "● Valid" : "● Target not found";
         public string Source
         {
             get; set;
@@ -183,7 +185,7 @@ public partial class LinkView : Page
                         if (!isReparse && !isShortcut) continue;
                         string? target = isShortcut ? GetShortcutTarget(path)
                             : isDirectory ? new DirectoryInfo(path).LinkTarget : new FileInfo(path).LinkTarget;
-                        string type = isShortcut ? "Shortcut" : isDirectory ? "Directory Link" : "File Link";
+                        string type = isShortcut ? "Shortcut" : isDirectory ? "Directory Link" : "Symbolic Link";
                         string? resolved = target;
                         if (!string.IsNullOrWhiteSpace(target) && !Path.IsPathFullyQualified(target))
                             resolved = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path)!, target));
