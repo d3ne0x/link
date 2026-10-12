@@ -15,7 +15,7 @@ $makeappx = Get-ChildItem $kit -Filter MakeAppx.exe -Recurse -ErrorAction Silent
 if (-not $makeappx) { throw 'Install Windows 10/11 SDK (MakeAppx.exe required).' }
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 New-Item -ItemType Directory -Path (Join-Path $stage 'Assets') -Force | Out-Null
-Copy-Item (Join-Path $publish '*') $stage -Recurse -Force
+Get-ChildItem -LiteralPath $publish -Force | Where-Object { $_.Extension -notin @('.pdb', '.xml') } | Copy-Item -Destination $stage -Recurse -Force
 Copy-Item (Join-Path $root 'packaging\AppxManifest.xml') (Join-Path $stage 'AppxManifest.xml')
 # Provisional brand tiles: replace with approved XELO artwork before submission.
 Add-Type -AssemblyName System.Drawing
