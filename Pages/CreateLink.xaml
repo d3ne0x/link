@@ -34,7 +34,8 @@
     </UniformGrid>
    </Grid>
   </Grid>
-  <Grid Grid.Row="1">
+  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" CanContentScroll="True">
+  <Grid MinHeight="195">
    <Grid x:Name="StepOne">
     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
     <UniformGrid Columns="3">
@@ -84,7 +85,7 @@
     </StackPanel>
    </Border>
    <Border x:Name="StepThree" Visibility="Collapsed" Background="White" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="8" Padding="14">
-    <StackPanel>
+    <StackPanel Margin="0,0,0,8">
      <Label x:Name="LinkText" Content="Link Path" FontWeight="SemiBold" FontSize="14"/>
      <TextBlock Text="Select the folder where the new link will be created." Foreground="#61728C" FontSize="12" Margin="0,0,0,10"/>
      <DockPanel>
@@ -95,7 +96,7 @@
      <TextBlock Text="Enter the new link name or use the existing target name." Foreground="#61728C" FontSize="12" Margin="0,0,0,8"/>
      <DockPanel>
       <Button x:Name="copyFileName" Content="Use target name" Style="{StaticResource Action}" DockPanel.Dock="Right" Margin="10,0,0,0" Click="useDestinationName"/>
-      <ui:TextBox x:Name="LinkName" PlaceholderText="New link name"/>
+      <ui:TextBox x:Name="LinkName" PlaceholderText="New link name" MinHeight="35" VerticalAlignment="Center"/>
      </DockPanel>
     </StackPanel>
    </Border>
@@ -106,6 +107,7 @@
     </StackPanel>
    </Border>
   </Grid>
+ </ScrollViewer>
   <ui:InfoBar Grid.Row="2" x:Name="InfoBar" IsOpen="False" Margin="0,8,0,0"/>
   <DockPanel Grid.Row="3" Margin="0,11,0,0" LastChildFill="False">
    <Button x:Name="WizardBack" Content="←  Back" Style="{StaticResource Action}" Click="WizardBack_Click" IsEnabled="False" DockPanel.Dock="Left"/>
