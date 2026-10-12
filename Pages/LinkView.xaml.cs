@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -271,20 +270,36 @@ public partial class LinkView : Page
         DeleteLink.IsEnabled = enableDelete;
     }
 
-    private void linkDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e) {
-        if (linkDataGrid.SelectedItem is Link selectedLink) {
-            if (!string.IsNullOrEmpty(selectedLink.Source)) {
-                try {
-                    Process.Start("explorer.exe", $"/select,\"{selectedLink.Source}\"");
-                } catch (Exception ex) {
-                    var messageBox = new Wpf.Ui.Controls.MessageBox {
-                        Title = "Error",
-                        Content = $"Failed to open link in File Explorer: {ex.Message}",
-                        CloseButtonText = "OK",
-                    };
-                    messageBox.ShowDialogAsync();
-                }
-            }
+    // Open Explorer with the selected item highlighted without spawning a child process.
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = true)]
+    private static extern int SHParseDisplayName(string name, IntPtr bindingContext,
+        out IntPtr pidl, uint attributesIn, out uint attributesOut);
+
+    [DllImport("shell32.dll", PreserveSig = true)]
+    private static extern int SHOpenFolderAndSelectItems(IntPtr folderPidl, uint itemCount,
+        IntPtr itemPidls, uint flags);
+
+    private void linkDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (linkDataGrid.SelectedItem is not Link selected || string.IsNullOrWhiteSpace(selected.Source))
+            return;
+        IntPtr pidl = IntPtr.Zero;
+        try
+        {
+            int hr = SHParseDisplayName(selected.Source, IntPtr.Zero, out pidl, 0, out _);
+            Marshal.ThrowExceptionForHR(hr);
+            hr = SHOpenFolderAndSelectItems(pidl, 0, IntPtr.Zero, 0);
+            Marshal.ThrowExceptionForHR(hr);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(
+                $"Failed to locate the link in File Explorer: {ex.Message}",
+                "Open in Explorer", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            if (pidl != IntPtr.Zero) Marshal.FreeCoTaskMem(pidl);
         }
     }
 
