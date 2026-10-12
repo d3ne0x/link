@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+ xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+ xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+ xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+ IgnorableNamespaces="uap desktop rescap">
+ <Identity Name="XELOLabs.XELOLink" Publisher="CN=DCC526A0-4D1E-44E7-8949-898FE66548B5" Version="1.0.0.0" ProcessorArchitecture="x64"/>
+ <Properties>
+  <DisplayName>XELO Link</DisplayName>
+  <PublisherDisplayName>XELO Labs</PublisherDisplayName>
+  <Logo>Assets\StoreLogo.png</Logo>
+ </Properties>
+ <Dependencies>
+  <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0"/>
+ </Dependencies>
+ <Resources><Resource Language="en-us"/></Resources>
+ <Applications>
+  <Application Id="App" Executable="Link.exe" EntryPoint="Windows.FullTrustApplication">
+   <uap:VisualElements DisplayName="XELO Link" Description="Create and manage Windows symbolic links, hard links and junctions."
+     BackgroundColor="#103F7C" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png"/>
+  </Application>
+ </Applications>
+ <Capabilities><rescap:Capability Name="runFullTrust"/></Capabilities>
+</Package>

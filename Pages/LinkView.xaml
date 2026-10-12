@@ -1,139 +1,36 @@
-﻿<Page x:Class="Symbolic11.Pages.LinkView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      mc:Ignorable="d"
-      d:DesignHeight="367"
-      d:DesignWidth="622"
-      Title="LinkView">
-
-
-    <Border x:Name="border"
-            Grid.Row="1"
-            Grid.Column="1"
-            BorderThickness="1"
-            CornerRadius="5">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0"
-                  Margin="5,5,5,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <Label Grid.Row="0"
-                       Content="Search Directory:"
-                       Margin="5,0,0,0"
-                       FontFamily="{StaticResource SegoueUIVariable}"
-                       FontSize="15"
-                       VerticalAlignment="Bottom" />
-                <TextBox x:Name="SearchPathText"
-                         Grid.Row="1"
-                         Grid.Column="0"
-                         TextWrapping="Wrap"
-                         Foreground="White"
-                         IsEnabled="False" />
-                <Button x:Name="changeSearchDirectory"
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Click="changeSearchDirectory_Click"
-                        Margin="6,0,0,0"
-                        Content="Browse"
-                        HorizontalAlignment="Right" />
-                <Button x:Name="searchButton"
-                        Click="searchButton_Click"
-                        Grid.Row="1"
-                        Grid.Column="2"
-                        Margin="14,0,0,0"
-                        Content="Search"
-                        HorizontalAlignment="Right" />
-
-
-            </Grid>
-
-            <Grid Grid.Row="1"
-                  Margin="5,0,5,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Border Grid.Column="0"
-                            Grid.Row="0"
-                            Margin="0,10,10,0"
-                            BorderThickness="1"
-                            CornerRadius="5">
-                        <ui:DataGrid x:Name="linkDataGrid"
-                                     SelectionChanged="linkDataGrid_SelectionChanged"
-                                     MouseDoubleClick="linkDataGrid_MouseDoubleClick"
-                                     AutoGenerateColumns="False"
-                                     RowStyle="{StaticResource DefaultDataGridRowStyle}"
-                                     BorderThickness="0,0,0,0"
-                                     Foreground="White"
-                                     SelectionMode="Single">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Source"
-                                                    Width="*"
-                                                    Binding="{Binding Source}"
-                                                    IsReadOnly="True" />
-                                <DataGridTextColumn Header="Type"
-                                                    Width="Auto"
-                                                    Binding="{Binding Type}"
-                                                    IsReadOnly="True" />
-                                <DataGridTextColumn Header="Target"
-                                                    Width="*"
-                                                    Binding="{Binding Target}"
-                                                    IsReadOnly="True" />
-                                <DataGridTextColumn Header="Result"
-                                                    Width="Auto"
-                                                    Binding="{Binding Result}"
-                                                    IsReadOnly="True" />
-                            </DataGrid.Columns>
-                        </ui:DataGrid>
-                    </Border>
-                    <Label Grid.Row="1"
-                           Content="Current Task:"
-                           Margin="5,0,0,0"
-                           FontFamily="{StaticResource SegoueUIVariable}"
-                           FontSize="15"
-                           VerticalAlignment="Bottom" />
-                    <TextBox x:Name="currentSearchDirectory"
-                             MaxHeight="36"
-                             Grid.Row="2"
-                             Margin="0,0,10,4"
-                             TextWrapping="Wrap"
-                             Foreground="White"
-                             IsEnabled="False" />
-                </Grid>
-
-                <Button x:Name="DeleteLink"
-                        Click="DeleteLink_Click"
-                        Margin="0,0,0,5"
-                        Content="Delete"
-                        Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Right"
-                        IsEnabled="False" />
-            </Grid>
-        </Grid>
-    </Border>
+<Page x:Class="Symbolic11.Pages.LinkView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#F8FBFE" Title="Existing Links" FontFamily="Segoe UI">
+ <Page.Resources>
+  <Style x:Key="Action" TargetType="Button"><Setter Property="Padding" Value="13,7"/><Setter Property="MinHeight" Value="34"/><Setter Property="Background" Value="#EDF2F7"/><Setter Property="BorderBrush" Value="#D4DFEA"/><Setter Property="Cursor" Value="Hand"/></Style>
+  <Style x:Key="Input" TargetType="TextBox"><Setter Property="MinHeight" Value="34"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Padding" Value="8,4"/><Setter Property="BorderBrush" Value="#D4DFEA"/></Style>
+ </Page.Resources>
+ <Grid Margin="25,17,24,14">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid Margin="0,0,0,13">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel Margin="0,0,20,0">
+    <TextBlock Text="Existing Links" FontSize="19" FontWeight="Bold" Foreground="#18283E"/>
+    <TextBlock Text="Select a folder to scan for symbolic links and junctions." FontSize="11" Foreground="#61728C" Margin="0,3,0,0"/>
+   </StackPanel>
+   <TextBlock Grid.Column="1" Text="Folder Path" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+   <TextBox x:Name="SearchPathText" Grid.Column="2" Style="{StaticResource Input}" IsReadOnly="True"/>
+   <Button x:Name="changeSearchDirectory" Grid.Column="3" Content="Browse..." Click="changeSearchDirectory_Click" Style="{StaticResource Action}" Margin="8,0"/>
+   <Button x:Name="searchButton" Grid.Column="4" Content="Scan" Click="searchButton_Click" Style="{StaticResource Action}" Background="#0869EF" Foreground="White" BorderThickness="0"/>
+  </Grid>
+  <Border Grid.Row="1" Background="White" BorderBrush="#DCE5EE" BorderThickness="1" CornerRadius="7">
+   <DataGrid x:Name="linkDataGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="linkDataGrid_SelectionChanged" MouseDoubleClick="linkDataGrid_MouseDoubleClick" GridLinesVisibility="Horizontal" HeadersVisibility="Column" RowHeight="31" CanUserAddRows="False" CanUserDeleteRows="False" AlternatingRowBackground="#F7FAFD" BorderThickness="0" FontSize="12">
+    <DataGrid.Columns>
+     <DataGridTextColumn Header="Name" Width="1.2*" Binding="{Binding Name}"/>
+     <DataGridTextColumn Header="Type" Width="1*" Binding="{Binding Type}"/>
+     <DataGridTextColumn Header="Link Path" Width="2.3*" Binding="{Binding Source}"/>
+     <DataGridTextColumn Header="Target Path" Width="2.3*" Binding="{Binding Target}"/>
+     <DataGridTextColumn Header="Status" Width="1*" Binding="{Binding Status}"/>
+    </DataGrid.Columns>
+   </DataGrid>
+  </Border>
+  <DockPanel Grid.Row="2" Margin="0,10,0,0">
+   <TextBlock Text="Current scan:" VerticalAlignment="Center" Foreground="#61728C" DockPanel.Dock="Left" Margin="0,0,8,0"/>
+   <Button x:Name="DeleteLink" Content="Delete selected link" DockPanel.Dock="Right" Click="DeleteLink_Click" IsEnabled="False" Style="{StaticResource Action}" Margin="12,0,0,0"/>
+   <TextBox x:Name="currentSearchDirectory" Style="{StaticResource Input}" Background="Transparent" BorderThickness="0" IsReadOnly="True" FontSize="11"/>
+  </DockPanel>
+ </Grid>
 </Page>

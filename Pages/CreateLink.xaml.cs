@@ -68,15 +68,106 @@ public partial class CreateLink : Page
         }
     }
 
+
+
+    private int selectedLinkType = 0;
+    private void SelectCard(int index)
+    {
+        selectedLinkType = index;
+        // Restrict the target kind to the selected link technology.
+        if (index == 1) FileType.SelectedIndex = 1;
+        if (index == 2) FileType.SelectedIndex = 0;
+        FileType.IsEnabled = index == 0;
+        SymbolicType.SelectedIndex = index;
+        var active = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(8, 105, 239));
+        var inactive = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 229, 238));
+        var background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(239, 246, 255));
+        SymbolicCard.BorderBrush = index == 0 ? active : inactive;
+        HardCard.BorderBrush = index == 1 ? active : inactive;
+        JunctionCard.BorderBrush = index == 2 ? active : inactive;
+        SymbolicCard.BorderThickness = index == 0 ? new Thickness(2) : new Thickness(1);
+        HardCard.BorderThickness = index == 1 ? new Thickness(2) : new Thickness(1);
+        JunctionCard.BorderThickness = index == 2 ? new Thickness(2) : new Thickness(1);
+        SymbolicCard.Background = index == 0 ? background : System.Windows.Media.Brushes.White;
+        HardCard.Background = index == 1 ? background : System.Windows.Media.Brushes.White;
+        JunctionCard.Background = index == 2 ? background : System.Windows.Media.Brushes.White;
+        SymbolicRadio.Text = index == 0 ? "◉" : "○";
+        HardRadio.Text = index == 1 ? "◉" : "○";
+        JunctionRadio.Text = index == 2 ? "◉" : "○";
+        SymbolicRadio.Foreground = index == 0 ? active : System.Windows.Media.Brushes.Gray;
+        HardRadio.Foreground = index == 1 ? active : System.Windows.Media.Brushes.Gray;
+        JunctionRadio.Foreground = index == 2 ? active : System.Windows.Media.Brushes.Gray;
+    }
+    private void SymbolicCard_Click(object sender, RoutedEventArgs e) => SelectCard(0);
+    private void HardCard_Click(object sender, RoutedEventArgs e) => SelectCard(1);
+    private void JunctionCard_Click(object sender, RoutedEventArgs e) => SelectCard(2);
+
+    private int wizardStep = 1;
+    private void ShowWizardStep()
+    {
+        StepOne.Visibility = wizardStep == 1 ? Visibility.Visible : Visibility.Collapsed;
+        StepTwo.Visibility = wizardStep == 2 ? Visibility.Visible : Visibility.Collapsed;
+        StepThree.Visibility = wizardStep == 3 ? Visibility.Visible : Visibility.Collapsed;
+        StepFour.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
+        string[] titles = { "Link type", "Target", "Link location", "Review & create" };
+        StepCaption.Text = $"Step {wizardStep} of 4 — {titles[wizardStep - 1]}";
+        ProgressOne.FontWeight = wizardStep == 1 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressTwo.FontWeight = wizardStep == 2 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressThree.FontWeight = wizardStep == 3 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressFour.FontWeight = wizardStep == 4 ? FontWeights.Bold : FontWeights.Normal;
+        WizardBack.IsEnabled = wizardStep > 1;
+        WizardNext.Visibility = wizardStep < 4 ? Visibility.Visible : Visibility.Collapsed;
+        CreateLinkButton.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
+        CreateLinkButton.IsEnabled = wizardStep == 4;
+        if (wizardStep == 4)
+            ReviewText.Text = $"Link type: {GetSelectedLinkTypeName()}\nTarget: {DestinationPath.Text}\nLink path: {Path.Combine(LinkFolderPath.Text, LinkName.Text)}\nLink name: {LinkName.Text}";
+    }
+    private void WizardBack_Click(object sender, RoutedEventArgs e)
+    {
+        if (wizardStep > 1) wizardStep--;
+        InfoBar.IsOpen = false;
+        ShowWizardStep();
+    }
+    private void WizardNext_Click(object sender, RoutedEventArgs e)
+    {
+        if (wizardStep == 2 && (linkFileType == "file" ? !File.Exists(DestinationPath.Text) : !Directory.Exists(DestinationPath.Text)))
+        {
+            ShowWizardError("Select an existing target file or folder.");
+            return;
+        }
+        if (wizardStep == 3 && (!Directory.Exists(LinkFolderPath.Text) || string.IsNullOrWhiteSpace(LinkName.Text) || LinkName.Text != Path.GetFileName(LinkName.Text) || LinkName.Text is "." or ".." || LinkName.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || LinkName.Text.EndsWith(" ") || LinkName.Text.EndsWith(".")))
+        {
+            ShowWizardError("Choose an existing parent folder and enter a link name.");
+            return;
+        }
+        if ((selectedLinkType == 1 && linkFileType != "file") || (selectedLinkType == 2 && linkFileType != "folder"))
+        {
+            ShowWizardError("The selected link type does not support this target kind.");
+            return;
+        }
+        if (wizardStep < 4) wizardStep++;
+        InfoBar.IsOpen = false;
+        ShowWizardStep();
+    }
+    private void WizardField_TextChanged(object sender, TextChangedEventArgs e) { }
+    private void ShowWizardError(string message)
+    {
+        InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Error;
+        InfoBar.Title = "Check your input";
+        InfoBar.Message = message;
+        InfoBar.IsOpen = true;
+    }
     public string linkFileType = "folder";
     public CreateLink()
     {
         InitializeComponent();
+        SelectCard(0);
+        ShowWizardStep();
 
         if (!IsDeveloperModeEnabled() && !IsUserAdministrator()) {
             InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Warning;
-            InfoBar.Title = "Insufficient Permissions";
-            InfoBar.Message = "The application is not running with administrative privileges. Link creation may fail.";
+            InfoBar.Title = "Symbolic link permissions";
+            InfoBar.Message = "Symbolic links may require Windows Developer Mode or the Create symbolic links privilege. Hard links and junctions normally do not require elevation.";
             InfoBar.IsOpen = true;
         }
 
@@ -110,12 +201,15 @@ public partial class CreateLink : Page
     private void FileType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
 
-        if (DestinationPath == null) { return; }
+        if (DestinationPath == null || FileType.SelectedItem == null || DestinationText == null || HardLink == null || JunctionLink == null || SymbolicType == null) { return; }
 
         var symbFileType = FileType.SelectedItem.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
         DestinationPath.Text = ""; //Clear path
-        CreateLinkButton.IsEnabled = false;
+        CreateLinkButton.IsEnabled = wizardStep == 4;
+
+        if (selectedLinkType == 1 && symbFileType == "Folder") { FileType.SelectedIndex = 1; return; }
+        if (selectedLinkType == 2 && symbFileType == "File") { FileType.SelectedIndex = 0; return; }
 
         switch (symbFileType)
         {
@@ -144,6 +238,7 @@ public partial class CreateLink : Page
                 break;
         }
 
+        // Never silently switch technologies when the target kind changes.
         if (linkFileType != "none")
         {
             DestinationExplore.IsEnabled = true;
@@ -191,8 +286,8 @@ public partial class CreateLink : Page
     {
         if (DestinationPath.Text != null)
         {
-            string fileName = Path.GetFileName(DestinationPath.Text);
-            LinkName.Text = Path.GetFileNameWithoutExtension(fileName);
+            string fileName = Path.GetFileName(Path.TrimEndingDirectorySeparator(DestinationPath.Text));
+            LinkName.Text = linkFileType == "file" ? fileName : fileName;
         }
     }
 
@@ -200,11 +295,11 @@ public partial class CreateLink : Page
     {
         if (!string.IsNullOrEmpty(LinkFolderPath.Text) && !string.IsNullOrEmpty(DestinationPath.Text))
         {
-            CreateLinkButton.IsEnabled = true;
+            CreateLinkButton.IsEnabled = wizardStep == 4;
         }
         else
         {
-            CreateLinkButton.IsEnabled = false;
+            CreateLinkButton.IsEnabled = wizardStep == 4;
         }
     }
 
@@ -252,7 +347,7 @@ public partial class CreateLink : Page
                 if (File.Exists(linkPath) || Directory.Exists(linkPath))
                     throw new IOException("The link path already exists or is invalid.");
 
-                switch (SymbolicType.Text)
+                switch (GetSelectedLinkTypeName())
                 {
                     case "Symbolic Link" when isFile:
                         File.CreateSymbolicLink(linkPath, targetPath);
@@ -282,14 +377,35 @@ public partial class CreateLink : Page
             {
                 InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Error;
                 InfoBar.Title = "Link creation failed";
-                InfoBar.Message = ex.Message;
+                InfoBar.Message = selectedLinkType == 0 && IsSymbolicLinkPrivilegeError(ex)
+                    ? "Windows blocked symbolic link creation. Enable Developer Mode in Windows Settings > System > For developers, then try again."
+                    : ex.Message;
                 InfoBar.IsOpen = true;
             }
         }
     }
 
+    private static bool IsSymbolicLinkPrivilegeError(Exception error)
+    {
+        for (Exception? current = error; current != null; current = current.InnerException)
+        {
+            if (current.HResult == unchecked((int)0x80070522)) return true;
+            if (current is System.ComponentModel.Win32Exception native && native.NativeErrorCode == 1314)
+                return true;
+        }
+        return false;
+    }
+
+    private string GetSelectedLinkTypeName() => selectedLinkType switch
+    {
+        1 => "Hard Link",
+        2 => "Junction Link",
+        _ => "Symbolic Link"
+    };
+
     private void SymbolicType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (LinkText == null || SymbolicType.SelectedItem == null) return;
         string? SymbolicTypeText = SymbolicType.SelectedItem?.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
         if (string.Equals(SymbolicTypeText, HardLink.Content?.ToString(), StringComparison.Ordinal))

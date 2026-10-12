@@ -9,7 +9,7 @@ public partial class App : System.Windows.Application
     {
         System.Windows.MessageBox.Show(
             $"An unexpected error occurred:\n{e.Exception.Message}",
-            "Symbolic11 Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            "XELO Link Error", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true;
     }
 }
