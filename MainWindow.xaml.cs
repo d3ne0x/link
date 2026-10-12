@@ -1,19 +1,27 @@
-﻿using System.Windows;
+using System.Windows;
 using Symbolic11.Pages;
-using Wpf.Ui.Controls;
 
 namespace Symbolic11;
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow {
 
-    public MainWindow() {
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
         InitializeComponent();
-
+        ShowCreate();
     }
-
-    private void RootNavigation_Loaded(object sender, RoutedEventArgs e) {
-        RootNavigation.Navigate(typeof(CreateLink));
+    private void ShowCreate()
+    {
+        Workspace.Navigate(new CreateLink());
+        CreateTab.FontWeight = FontWeights.SemiBold;
+        ManageTab.FontWeight = FontWeights.Normal;
     }
+    private void ShowManage()
+    {
+        Workspace.Navigate(new LinkView());
+        CreateTab.FontWeight = FontWeights.Normal;
+        ManageTab.FontWeight = FontWeights.SemiBold;
+    }
+    private void Create_Click(object sender, RoutedEventArgs e) => ShowCreate();
+    private void Manage_Click(object sender, RoutedEventArgs e) => ShowManage();
 }
