@@ -2,94 +2,115 @@
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
- Background="#F7F8FA" Title="Create Link">
+ Background="#F8FBFE" Title="Create Link" FontFamily="Segoe UI">
  <Page.Resources>
-  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="#243244"/></Style>
-  <Style TargetType="TextBox"><Setter Property="MinHeight" Value="34"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
-  <Style TargetType="Button"><Setter Property="MinHeight" Value="35"/><Setter Property="Padding" Value="14,6"/></Style>
+  <Style x:Key="Action" TargetType="Button"><Setter Property="Padding" Value="17,8"/><Setter Property="MinHeight" Value="35"/><Setter Property="Background" Value="#EDF2F7"/><Setter Property="BorderBrush" Value="#D4DFEA"/><Setter Property="Cursor" Value="Hand"/></Style>
+  <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource Action}"><Setter Property="Background" Value="#0869EF"/><Setter Property="Foreground" Value="White"/><Setter Property="BorderThickness" Value="0"/></Style>
+  <Style x:Key="Input" TargetType="TextBox"><Setter Property="MinHeight" Value="34"/><Setter Property="VerticalContentAlignment" Value="Center"/><Setter Property="Padding" Value="9,4"/><Setter Property="BorderBrush" Value="#D4DFEA"/></Style>
+  <Style x:Key="Card" TargetType="Button"><Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="#DCE5EE"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Padding" Value="12"/></Style>
  </Page.Resources>
- <Grid Margin="32,24">
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <TextBlock Text="Create a link" FontSize="25" FontWeight="SemiBold"/>
-  <TextBlock x:Name="StepCaption" Grid.Row="1" Text="Step 1 of 4 — Link type" Foreground="#637084" Margin="0,7,0,24" FontSize="14"/>
-  <Grid Grid.Row="2" Margin="0,0,0,22">
-   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-   <TextBlock x:Name="ProgressOne" Grid.Column="0" Text="①  Link Type" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#0869EF"/>
-   <TextBlock x:Name="ProgressTwo" Grid.Column="1" Text="②  Target" HorizontalAlignment="Center"/>
-   <TextBlock x:Name="ProgressThree" Grid.Column="2" Text="③  Link Location" HorizontalAlignment="Center"/>
-   <TextBlock x:Name="ProgressFour" Grid.Column="3" Text="④  Review &amp; Create" HorizontalAlignment="Center"/>
+ <Grid Margin="28,12,24,12">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid Grid.Row="0" Margin="0,0,0,13">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <StackPanel>
+    <TextBlock Text="Create a Link" FontSize="19" FontWeight="Bold" Foreground="#14243B"/>
+    <TextBlock x:Name="StepCaption" Text="Step 1 of 4 — Choose Link Type" FontSize="12" Foreground="#30425A" Margin="0,4,0,0"/>
+   </StackPanel>
+   <Grid Grid.Column="1" Margin="5,0,0,0">
+    <Grid.RowDefinitions><RowDefinition Height="24"/><RowDefinition Height="19"/></Grid.RowDefinitions>
+    <Border Background="#D7E2EE" Height="2" Margin="35,0" VerticalAlignment="Center"/>
+    <UniformGrid Columns="4">
+     <Border Width="21" Height="21" Background="#0869EF" CornerRadius="11" HorizontalAlignment="Center"><TextBlock x:Name="ProgressOne" Text="1" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/></Border>
+     <Border Width="21" Height="21" Background="White" BorderBrush="#B9CBDD" BorderThickness="1" CornerRadius="11" HorizontalAlignment="Center"><TextBlock x:Name="ProgressTwo" Text="2" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+     <Border Width="21" Height="21" Background="White" BorderBrush="#B9CBDD" BorderThickness="1" CornerRadius="11" HorizontalAlignment="Center"><TextBlock x:Name="ProgressThree" Text="3" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+     <Border Width="21" Height="21" Background="White" BorderBrush="#B9CBDD" BorderThickness="1" CornerRadius="11" HorizontalAlignment="Center"><TextBlock x:Name="ProgressFour" Text="4" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+    </UniformGrid>
+    <UniformGrid Grid.Row="1" Columns="4">
+     <TextBlock Text="Link Type" HorizontalAlignment="Center" FontSize="10"/>
+     <TextBlock Text="Target" HorizontalAlignment="Center" FontSize="10"/>
+     <TextBlock Text="Link Location" HorizontalAlignment="Center" FontSize="10"/>
+     <TextBlock Text="Review &amp; Create" HorizontalAlignment="Center" FontSize="10"/>
+    </UniformGrid>
+   </Grid>
   </Grid>
-  <Border Grid.Row="3" Background="White" BorderBrush="#DCE2E9" BorderThickness="1" CornerRadius="8" Padding="24">
-   <Grid>
-    <StackPanel x:Name="StepOne">
-     <TextBlock Text="Choose link type" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-     <ComboBox x:Name="SymbolicType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="SymbolicType_SelectionChanged" Visibility="Collapsed">
-      <ComboBoxItem Content="Symbolic Link"/>
-      <ComboBoxItem x:Name="HardLink" Content="Hard Link" IsEnabled="False"/>
-      <ComboBoxItem x:Name="JunctionLink" Content="Junction Link"/>
-     </ComboBox>
-     <UniformGrid Columns="3" Margin="0,4,0,16">
-      <Button x:Name="SymbolicCard" Click="SymbolicCard_Click" Margin="0,0,10,0" MinHeight="175" Background="#EAF3FF" BorderBrush="#0869EF" BorderThickness="2">
-       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="↗" FontSize="32" HorizontalAlignment="Center"/>
-        <TextBlock Text="Symbolic Link" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
-        <TextBlock Text="File or folder" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-       </StackPanel>
-      </Button>
-      <Button x:Name="HardCard" Click="HardCard_Click" Margin="0,0,10,0" MinHeight="175" Background="#FFFFFF" BorderBrush="#DCE2E9">
-       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="▤" FontSize="34" HorizontalAlignment="Center"/>
-        <TextBlock Text="Hard Link" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
-        <TextBlock Text="Files only" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-       </StackPanel>
-      </Button>
-      <Button x:Name="JunctionCard" Click="JunctionCard_Click" MinHeight="175" Background="#FFFFFF" BorderBrush="#DCE2E9">
-       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="▱" FontSize="34" HorizontalAlignment="Center"/>
-        <TextBlock Text="Junction" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
-        <TextBlock Text="Folders only" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-       </StackPanel>
-      </Button>
-     </UniformGrid><TextBlock Text="Target kind" Margin="0,10,0,8" FontWeight="SemiBold"/>
-     <ComboBox x:Name="FileType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="FileType_SelectionChanged">
-      <ComboBoxItem Content="Folder"/><ComboBoxItem Content="File"/>
-     </ComboBox>
-     <TextBlock Text="Choose the link type above. Symbolic links work with files or folders; hard links with files; junctions with folders." TextWrapping="Wrap" Foreground="#637084" Margin="0,20,0,0"/>
-    </StackPanel>
-    <StackPanel x:Name="StepTwo" Visibility="Collapsed">
-     <TextBlock Text="Choose existing target" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-     <Label x:Name="DestinationText" Content="Target Folder (existing)"/>
-     <DockPanel>
-      <Button x:Name="DestinationExplore" Content="Browse..." Click="DestinationExplore_Click" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-      <TextBox x:Name="DestinationPath" IsReadOnly="False" TextChanged="WizardField_TextChanged"/>
-     </DockPanel>
-     <TextBlock Text="The target must already exist." Foreground="#637084" Margin="0,14,0,0"/>
-    </StackPanel>
-    <StackPanel x:Name="StepThree" Visibility="Collapsed">
-     <TextBlock Text="Choose link location" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-     <Label x:Name="LinkText" Content="Link Location (parent folder)"/>
-     <DockPanel>
-      <Button x:Name="LinkExplore" Content="Browse..." Click="LinkExplore_Click" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-      <TextBox x:Name="LinkFolderPath" TextChanged="WizardField_TextChanged"/>
-     </DockPanel>
-     <TextBlock Text="Link name" Margin="0,20,0,8" FontWeight="SemiBold"/>
-     <DockPanel>
-      <Button x:Name="copyFileName" Content="Use target name" Click="useDestinationName" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-      <ui:TextBox x:Name="LinkName" PlaceholderText="Enter link name"/>
-     </DockPanel>
-    </StackPanel>
-    <StackPanel x:Name="StepFour" Visibility="Collapsed">
-     <TextBlock Text="Review and create" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,14"/>
-     <TextBlock x:Name="ReviewText" TextWrapping="Wrap" FontSize="14" LineHeight="27"/>
-     <TextBlock Text="The existing target will not be overwritten." Foreground="#637084" Margin="0,18,0,0"/>
+  <Grid Grid.Row="1">
+   <Grid x:Name="StepOne">
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <UniformGrid Columns="3">
+     <Button x:Name="SymbolicCard" Click="SymbolicCard_Click" Style="{StaticResource Card}" Margin="0,0,10,0" Background="#EFF6FF" BorderBrush="#0869EF" BorderThickness="2">
+      <StackPanel VerticalAlignment="Center">
+       <TextBlock Text="🔗" FontSize="32" HorizontalAlignment="Center"/>
+       <TextBlock Text="Symbolic Link" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+       <TextBlock Text="Create a link to a file or folder.&#10;Can reference different volumes." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
+       <TextBlock Text="◉" Foreground="#0869EF" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+      </StackPanel>
+     </Button>
+     <Button x:Name="HardCard" Click="HardCard_Click" Style="{StaticResource Card}" Margin="0,0,10,0">
+      <StackPanel VerticalAlignment="Center">
+       <TextBlock Text="▤" FontSize="34" HorizontalAlignment="Center"/>
+       <TextBlock Text="Hard Link" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+       <TextBlock Text="Files only.&#10;Must be on the same volume." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
+       <TextBlock Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+      </StackPanel>
+     </Button>
+     <Button x:Name="JunctionCard" Click="JunctionCard_Click" Style="{StaticResource Card}">
+      <StackPanel VerticalAlignment="Center">
+       <TextBlock Text="▱" FontSize="34" HorizontalAlignment="Center"/>
+       <TextBlock Text="Junction" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+       <TextBlock Text="Create a directory junction.&#10;For folders within Windows." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Margin="0,10,0,0"/>
+       <TextBlock Text="○" Foreground="#91A3B7" FontSize="19" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+      </StackPanel>
+     </Button>
+    </UniformGrid>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,9,0,0">
+     <TextBlock Text="Target kind:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+     <ComboBox x:Name="FileType" Width="125" SelectedIndex="0" SelectionChanged="FileType_SelectionChanged"><ComboBoxItem Content="Folder"/><ComboBoxItem Content="File"/></ComboBox>
+     <ComboBox x:Name="SymbolicType" Visibility="Collapsed" SelectedIndex="0" SelectionChanged="SymbolicType_SelectionChanged"><ComboBoxItem Content="Symbolic Link"/><ComboBoxItem x:Name="HardLink" Content="Hard Link" IsEnabled="False"/><ComboBoxItem x:Name="JunctionLink" Content="Junction Link"/></ComboBox>
     </StackPanel>
    </Grid>
-  </Border>
-  <ui:InfoBar Grid.Row="4" x:Name="InfoBar" Title="" Message="" Margin="0,12,0,0" IsOpen="False"/>
-  <DockPanel Grid.Row="5" Margin="0,18,0,0">
-   <Button x:Name="WizardBack" Content="Back" Click="WizardBack_Click" IsEnabled="False" DockPanel.Dock="Left"/>
-   <Button x:Name="CreateLinkButton" Content="Create Link" Click="CreateLink_Click" DockPanel.Dock="Right" Visibility="Collapsed"/>
-   <Button x:Name="WizardNext" Content="Next" Click="WizardNext_Click" DockPanel.Dock="Right"/>
+   <Border x:Name="StepTwo" Visibility="Collapsed" Background="White" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="8" Padding="14">
+    <StackPanel>
+     <TextBlock Text="Target Path" FontWeight="SemiBold" FontSize="14"/>
+     <TextBlock Text="Select the existing file or folder that you want to link to." FontSize="12" Foreground="#61728C" Margin="0,4,0,10"/>
+     <Label x:Name="DestinationText" Content="Existing target folder" Visibility="Collapsed"/>
+     <DockPanel>
+      <Button x:Name="DestinationExplore" Content="Browse..." Style="{StaticResource Action}" DockPanel.Dock="Right" Margin="10,0,0,0" Click="DestinationExplore_Click"/>
+      <TextBox x:Name="DestinationPath" Style="{StaticResource Input}" TextChanged="WizardField_TextChanged"/>
+     </DockPanel>
+     <Border Background="#E7F3FF" CornerRadius="5" Padding="13" Margin="0,16,0,0">
+      <TextBlock Text="ⓘ   The target must exist before creating the link." Foreground="#0057C5" FontSize="12"/>
+     </Border>
+    </StackPanel>
+   </Border>
+   <Border x:Name="StepThree" Visibility="Collapsed" Background="White" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="8" Padding="14">
+    <StackPanel>
+     <Label x:Name="LinkText" Content="Link Path" FontWeight="SemiBold" FontSize="14"/>
+     <TextBlock Text="Select the folder where the new link will be created." Foreground="#61728C" FontSize="12" Margin="0,0,0,10"/>
+     <DockPanel>
+      <Button x:Name="LinkExplore" Content="Browse..." Style="{StaticResource Action}" DockPanel.Dock="Right" Margin="10,0,0,0" Click="LinkExplore_Click"/>
+      <TextBox x:Name="LinkFolderPath" Style="{StaticResource Input}" TextChanged="WizardField_TextChanged"/>
+     </DockPanel>
+     <TextBlock Text="Link Name" FontWeight="SemiBold" Margin="0,16,0,4"/>
+     <TextBlock Text="Enter the new link name or use the existing target name." Foreground="#61728C" FontSize="12" Margin="0,0,0,8"/>
+     <DockPanel>
+      <Button x:Name="copyFileName" Content="Use target name" Style="{StaticResource Action}" DockPanel.Dock="Right" Margin="10,0,0,0" Click="useDestinationName"/>
+      <ui:TextBox x:Name="LinkName" PlaceholderText="New link name"/>
+     </DockPanel>
+    </StackPanel>
+   </Border>
+   <Border x:Name="StepFour" Visibility="Collapsed" Background="White" BorderBrush="#E1E8F0" BorderThickness="1" CornerRadius="8" Padding="16">
+    <StackPanel>
+     <TextBlock Text="Review your settings" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,12"/>
+     <TextBlock x:Name="ReviewText" TextWrapping="Wrap" FontSize="13" LineHeight="28"/>
+    </StackPanel>
+   </Border>
+  </Grid>
+  <ui:InfoBar Grid.Row="2" x:Name="InfoBar" IsOpen="False" Margin="0,8,0,0"/>
+  <DockPanel Grid.Row="3" Margin="0,11,0,0" LastChildFill="False">
+   <Button x:Name="WizardBack" Content="←  Back" Style="{StaticResource Action}" Click="WizardBack_Click" IsEnabled="False" DockPanel.Dock="Left"/>
+   <Button x:Name="CreateLinkButton" Content="✓  Create Link" Background="#009B64" Foreground="White" Style="{StaticResource Action}" Click="CreateLink_Click" Visibility="Collapsed" DockPanel.Dock="Right"/>
+   <Button x:Name="WizardNext" Content="Next  →" Style="{StaticResource Primary}" Click="WizardNext_Click" DockPanel.Dock="Right"/>
   </DockPanel>
  </Grid>
 </Page>
