@@ -70,17 +70,33 @@ public partial class CreateLink : Page
 
 
 
+    private int selectedLinkType = 0;
     private void SelectCard(int index)
     {
+        selectedLinkType = index;
+        // Restrict the target kind to the selected link technology.
         if (index == 1) FileType.SelectedIndex = 1;
         if (index == 2) FileType.SelectedIndex = 0;
+        FileType.IsEnabled = index == 0;
         SymbolicType.SelectedIndex = index;
-        SymbolicCard.BorderBrush = index == 0 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
-        HardCard.BorderBrush = index == 1 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
-        JunctionCard.BorderBrush = index == 2 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
-        SymbolicCard.Background = index == 0 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
-        HardCard.Background = index == 1 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
-        JunctionCard.Background = index == 2 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
+        var active = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(8, 105, 239));
+        var inactive = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 229, 238));
+        var background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(239, 246, 255));
+        SymbolicCard.BorderBrush = index == 0 ? active : inactive;
+        HardCard.BorderBrush = index == 1 ? active : inactive;
+        JunctionCard.BorderBrush = index == 2 ? active : inactive;
+        SymbolicCard.BorderThickness = index == 0 ? new Thickness(2) : new Thickness(1);
+        HardCard.BorderThickness = index == 1 ? new Thickness(2) : new Thickness(1);
+        JunctionCard.BorderThickness = index == 2 ? new Thickness(2) : new Thickness(1);
+        SymbolicCard.Background = index == 0 ? background : System.Windows.Media.Brushes.White;
+        HardCard.Background = index == 1 ? background : System.Windows.Media.Brushes.White;
+        JunctionCard.Background = index == 2 ? background : System.Windows.Media.Brushes.White;
+        SymbolicRadio.Text = index == 0 ? "◉" : "○";
+        HardRadio.Text = index == 1 ? "◉" : "○";
+        JunctionRadio.Text = index == 2 ? "◉" : "○";
+        SymbolicRadio.Foreground = index == 0 ? active : System.Windows.Media.Brushes.Gray;
+        HardRadio.Foreground = index == 1 ? active : System.Windows.Media.Brushes.Gray;
+        JunctionRadio.Foreground = index == 2 ? active : System.Windows.Media.Brushes.Gray;
     }
     private void SymbolicCard_Click(object sender, RoutedEventArgs e) => SelectCard(0);
     private void HardCard_Click(object sender, RoutedEventArgs e) => SelectCard(1);
@@ -104,7 +120,7 @@ public partial class CreateLink : Page
         CreateLinkButton.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
         CreateLinkButton.IsEnabled = wizardStep == 4;
         if (wizardStep == 4)
-            ReviewText.Text = $"Link type: {SymbolicType.Text}\nTarget: {DestinationPath.Text}\nLink path: {Path.Combine(LinkFolderPath.Text, LinkName.Text)}\nLink name: {LinkName.Text}";
+            ReviewText.Text = $"Link type: {GetSelectedLinkTypeName()}\nTarget: {DestinationPath.Text}\nLink path: {Path.Combine(LinkFolderPath.Text, LinkName.Text)}\nLink name: {LinkName.Text}";
     }
     private void WizardBack_Click(object sender, RoutedEventArgs e)
     {
@@ -124,6 +140,11 @@ public partial class CreateLink : Page
             ShowWizardError("Choose an existing parent folder and enter a link name.");
             return;
         }
+        if ((selectedLinkType == 1 && linkFileType != "file") || (selectedLinkType == 2 && linkFileType != "folder"))
+        {
+            ShowWizardError("The selected link type does not support this target kind.");
+            return;
+        }
         if (wizardStep < 4) wizardStep++;
         InfoBar.IsOpen = false;
         ShowWizardStep();
@@ -140,6 +161,7 @@ public partial class CreateLink : Page
     public CreateLink()
     {
         InitializeComponent();
+        SelectCard(0);
         ShowWizardStep();
 
         if (!IsDeveloperModeEnabled() && !IsUserAdministrator()) {
@@ -186,6 +208,9 @@ public partial class CreateLink : Page
         DestinationPath.Text = ""; //Clear path
         CreateLinkButton.IsEnabled = wizardStep == 4;
 
+        if (selectedLinkType == 1 && symbFileType == "Folder") { FileType.SelectedIndex = 1; return; }
+        if (selectedLinkType == 2 && symbFileType == "File") { FileType.SelectedIndex = 0; return; }
+
         switch (symbFileType)
         {
             case "File":
@@ -213,6 +238,7 @@ public partial class CreateLink : Page
                 break;
         }
 
+        // Never silently switch technologies when the target kind changes.
         if (linkFileType != "none")
         {
             DestinationExplore.IsEnabled = true;
@@ -321,7 +347,7 @@ public partial class CreateLink : Page
                 if (File.Exists(linkPath) || Directory.Exists(linkPath))
                     throw new IOException("The link path already exists or is invalid.");
 
-                switch (SymbolicType.Text)
+                switch (GetSelectedLinkTypeName())
                 {
                     case "Symbolic Link" when isFile:
                         File.CreateSymbolicLink(linkPath, targetPath);
@@ -356,6 +382,13 @@ public partial class CreateLink : Page
             }
         }
     }
+
+    private string GetSelectedLinkTypeName() => selectedLinkType switch
+    {
+        1 => "Hard Link",
+        2 => "Junction Link",
+        _ => "Symbolic Link"
+    };
 
     private void SymbolicType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
