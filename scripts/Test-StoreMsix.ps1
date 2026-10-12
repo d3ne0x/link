@@ -16,6 +16,8 @@ try {
     $requiredFiles = @(
         'AppxManifest.xml',
         'Link.exe',
+        'Link.dll',
+        'Link.runtimeconfig.json',
         'Assets/StoreLogo.png',
         'Assets/Square150x150Logo.png',
         'Assets/Square44x44Logo.png'
@@ -24,6 +26,17 @@ try {
         if ($entries -notcontains $required) {
             throw "Missing MSIX payload: $required"
         }
+    }
+
+    foreach ($forbidden in @('coreclr.dll','hostfxr.dll','System.Private.CoreLib.dll','PresentationFramework.dll')) {
+        if ($entries -contains $forbidden) { throw "Bundled .NET runtime found: $forbidden. Build framework-dependent MSIX." }
+    }
+    $runtimeEntry = $zip.GetEntry('Link.runtimeconfig.json')
+    $runtimeReader = New-Object System.IO.StreamReader($runtimeEntry.Open())
+    try { $runtimeConfig = $runtimeReader.ReadToEnd() | ConvertFrom-Json }
+    finally { $runtimeReader.Dispose() }
+    if (@($runtimeConfig.runtimeOptions.frameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' }).Count -eq 0) {
+        throw 'MSIX runtimeconfig does not declare Microsoft.WindowsDesktop.App.'
     }
 
     # MakeAppx adds AppxBlockMap.xml and [Content_Types].xml as package metadata.
