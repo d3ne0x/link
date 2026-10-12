@@ -68,6 +68,53 @@ public partial class CreateLink : Page
         }
     }
 
+
+    private int wizardStep = 1;
+    private void ShowWizardStep()
+    {
+        StepOne.Visibility = wizardStep == 1 ? Visibility.Visible : Visibility.Collapsed;
+        StepTwo.Visibility = wizardStep == 2 ? Visibility.Visible : Visibility.Collapsed;
+        StepThree.Visibility = wizardStep == 3 ? Visibility.Visible : Visibility.Collapsed;
+        StepFour.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
+        string[] titles = { "Link type", "Target", "Link location", "Review & create" };
+        StepCaption.Text = $"Step {wizardStep} of 4 — {titles[wizardStep - 1]}";
+        WizardBack.IsEnabled = wizardStep > 1;
+        WizardNext.Visibility = wizardStep < 4 ? Visibility.Visible : Visibility.Collapsed;
+        CreateLinkButton.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
+        CreateLinkButton.IsEnabled = wizardStep == 4;
+        if (wizardStep == 4)
+            ReviewText.Text = $"Link type: {SymbolicType.Text}\nTarget: {DestinationPath.Text}\nLink folder: {LinkFolderPath.Text}\nLink name: {LinkName.Text}";
+    }
+    private void WizardBack_Click(object sender, RoutedEventArgs e)
+    {
+        if (wizardStep > 1) wizardStep--;
+        InfoBar.IsOpen = false;
+        ShowWizardStep();
+    }
+    private void WizardNext_Click(object sender, RoutedEventArgs e)
+    {
+        if (wizardStep == 2 && !(File.Exists(DestinationPath.Text) || Directory.Exists(DestinationPath.Text)))
+        {
+            ShowWizardError("Select an existing target file or folder.");
+            return;
+        }
+        if (wizardStep == 3 && (!Directory.Exists(LinkFolderPath.Text) || string.IsNullOrWhiteSpace(LinkName.Text)))
+        {
+            ShowWizardError("Choose an existing parent folder and enter a link name.");
+            return;
+        }
+        if (wizardStep < 4) wizardStep++;
+        InfoBar.IsOpen = false;
+        ShowWizardStep();
+    }
+    private void WizardField_TextChanged(object sender, TextChangedEventArgs e) { }
+    private void ShowWizardError(string message)
+    {
+        InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Error;
+        InfoBar.Title = "Check your input";
+        InfoBar.Message = message;
+        InfoBar.IsOpen = true;
+    }
     public string linkFileType = "folder";
     public CreateLink()
     {
@@ -110,12 +157,12 @@ public partial class CreateLink : Page
     private void FileType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
 
-        if (DestinationPath == null) { return; }
+        if (DestinationPath == null || FileType.SelectedItem == null) { return; }
 
         var symbFileType = FileType.SelectedItem.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
         DestinationPath.Text = ""; //Clear path
-        CreateLinkButton.IsEnabled = false;
+        CreateLinkButton.IsEnabled = wizardStep == 4;
 
         switch (symbFileType)
         {
@@ -200,11 +247,11 @@ public partial class CreateLink : Page
     {
         if (!string.IsNullOrEmpty(LinkFolderPath.Text) && !string.IsNullOrEmpty(DestinationPath.Text))
         {
-            CreateLinkButton.IsEnabled = true;
+            CreateLinkButton.IsEnabled = wizardStep == 4;
         }
         else
         {
-            CreateLinkButton.IsEnabled = false;
+            CreateLinkButton.IsEnabled = wizardStep == 4;
         }
     }
 
@@ -290,6 +337,7 @@ public partial class CreateLink : Page
 
     private void SymbolicType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (LinkText == null || SymbolicType.SelectedItem == null) return;
         string? SymbolicTypeText = SymbolicType.SelectedItem?.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
         if (string.Equals(SymbolicTypeText, HardLink.Content?.ToString(), StringComparison.Ordinal))
