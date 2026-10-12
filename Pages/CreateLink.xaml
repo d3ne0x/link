@@ -9,23 +9,52 @@
   <Style TargetType="Button"><Setter Property="MinHeight" Value="35"/><Setter Property="Padding" Value="14,6"/></Style>
  </Page.Resources>
  <Grid Margin="32,24">
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <TextBlock Text="Create a link" FontSize="25" FontWeight="SemiBold"/>
   <TextBlock x:Name="StepCaption" Grid.Row="1" Text="Step 1 of 4 — Link type" Foreground="#637084" Margin="0,7,0,24" FontSize="14"/>
-  <Border Grid.Row="2" Background="White" BorderBrush="#DCE2E9" BorderThickness="1" CornerRadius="8" Padding="24">
+  <Grid Grid.Row="2" Margin="0,0,0,22">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <TextBlock x:Name="ProgressOne" Grid.Column="0" Text="①  Link Type" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#0869EF"/>
+   <TextBlock x:Name="ProgressTwo" Grid.Column="1" Text="②  Target" HorizontalAlignment="Center"/>
+   <TextBlock x:Name="ProgressThree" Grid.Column="2" Text="③  Link Location" HorizontalAlignment="Center"/>
+   <TextBlock x:Name="ProgressFour" Grid.Column="3" Text="④  Review &amp; Create" HorizontalAlignment="Center"/>
+  </Grid>
+  <Border Grid.Row="3" Background="White" BorderBrush="#DCE2E9" BorderThickness="1" CornerRadius="8" Padding="24">
    <Grid>
     <StackPanel x:Name="StepOne">
      <TextBlock Text="Choose link type" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-     <ComboBox x:Name="SymbolicType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="SymbolicType_SelectionChanged">
+     <ComboBox x:Name="SymbolicType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="SymbolicType_SelectionChanged" Visibility="Collapsed">
       <ComboBoxItem Content="Symbolic Link"/>
       <ComboBoxItem x:Name="HardLink" Content="Hard Link" IsEnabled="False"/>
       <ComboBoxItem x:Name="JunctionLink" Content="Junction Link"/>
      </ComboBox>
-     <TextBlock Text="Target kind" Margin="0,22,0,8" FontWeight="SemiBold"/>
-     <ComboBox x:Name="FileType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="FileType_SelectionChanged">
+     <UniformGrid Columns="3" Margin="0,4,0,16">
+      <Button x:Name="SymbolicCard" Click="SymbolicCard_Click" Margin="0,0,10,0" MinHeight="175" Background="#EAF3FF" BorderBrush="#0869EF" BorderThickness="2">
+       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="🔗" FontSize="32" HorizontalAlignment="Center"/>
+        <TextBlock Text="Symbolic Link" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        <TextBlock Text="File or folder" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+       </StackPanel>
+      </Button>
+      <Button x:Name="HardCard" Click="HardCard_Click" Margin="0,0,10,0" MinHeight="175" Background="#FFFFFF" BorderBrush="#DCE2E9">
+       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="▤" FontSize="34" HorizontalAlignment="Center"/>
+        <TextBlock Text="Hard Link" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        <TextBlock Text="Files only" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+       </StackPanel>
+      </Button>
+      <Button x:Name="JunctionCard" Click="JunctionCard_Click" MinHeight="175" Background="#FFFFFF" BorderBrush="#DCE2E9">
+       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="▱" FontSize="34" HorizontalAlignment="Center"/>
+        <TextBlock Text="Junction" FontWeight="SemiBold" FontSize="16" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        <TextBlock Text="Folders only" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+       </StackPanel>
+      </Button>
+     </UniformGrid><TextBlock Text="Target kind" Margin="0,10,0,8" FontWeight="SemiBold"/>
+     <ComboBox x:Name="FileType" Width="310" HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="FileType_SelectionChanged" Visibility="Collapsed">
       <ComboBoxItem Content="Folder"/><ComboBoxItem Content="File"/>
      </ComboBox>
-     <TextBlock Text="Symbolic links work with files or folders. Hard links are for files; junctions are for folders." TextWrapping="Wrap" Foreground="#637084" Margin="0,20,0,0"/>
+     <TextBlock Text="Choose the link type above. Symbolic links work with files or folders; hard links with files; junctions with folders." TextWrapping="Wrap" Foreground="#637084" Margin="0,20,0,0"/>
     </StackPanel>
     <StackPanel x:Name="StepTwo" Visibility="Collapsed">
      <TextBlock Text="Choose existing target" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
@@ -56,8 +85,8 @@
     </StackPanel>
    </Grid>
   </Border>
-  <ui:InfoBar Grid.Row="3" x:Name="InfoBar" Title="" Message="" Margin="0,12,0,0" IsOpen="False"/>
-  <DockPanel Grid.Row="4" Margin="0,18,0,0">
+  <ui:InfoBar Grid.Row="4" x:Name="InfoBar" Title="" Message="" Margin="0,12,0,0" IsOpen="False"/>
+  <DockPanel Grid.Row="5" Margin="0,18,0,0">
    <Button x:Name="WizardBack" Content="Back" Click="WizardBack_Click" IsEnabled="False" DockPanel.Dock="Left"/>
    <Button x:Name="CreateLinkButton" Content="Create Link" Click="CreateLink_Click" DockPanel.Dock="Right" Visibility="Collapsed"/>
    <Button x:Name="WizardNext" Content="Next" Click="WizardNext_Click" DockPanel.Dock="Right"/>
