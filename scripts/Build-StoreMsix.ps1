@@ -7,6 +7,16 @@ $out = Join-Path $root 'artifacts\msix\XELO-Link-1.0.0.0-x64.msix'
 $publish = Join-Path $root 'artifacts\publish\win-x64'
 $exe = Join-Path $publish 'Link.exe'
 if (-not (Test-Path $exe)) { throw 'Run .\scripts\Build-Release.ps1 before packaging.' }
+$runtimeConfig = Join-Path $publish 'Link.runtimeconfig.json'
+if (-not (Test-Path -LiteralPath $runtimeConfig)) { throw 'Missing runtimeconfig. Rebuild using Build-Release.ps1.' }
+$config = Get-Content -LiteralPath $runtimeConfig -Raw | ConvertFrom-Json
+$frameworks = @($config.runtimeOptions.frameworks)
+if (@($frameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' }).Count -eq 0) {
+ throw 'Store MSIX requires FrameworkDependent publish. Run Build-Release.ps1 -BuildVariant FrameworkDependent.'
+}
+foreach ($unexpected in @('coreclr.dll','hostfxr.dll','System.Private.CoreLib.dll')) {
+ if (Test-Path -LiteralPath (Join-Path $publish $unexpected)) { throw "Self-contained runtime detected ($unexpected). Rebuild framework-dependent." }
+}
 $kit = Join-Path $env:ProgramFiles 'Windows Kits\10\bin'
 if (-not (Test-Path $kit)) { $kit = Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Windows Kits\10\bin' }
 $makeappx = Get-ChildItem $kit -Filter MakeAppx.exe -Recurse -ErrorAction SilentlyContinue |
