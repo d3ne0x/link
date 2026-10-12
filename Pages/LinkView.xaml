@@ -33,7 +33,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0"
-                       Content="Search Directory:"
+                       Content="Scan folder"
                        Margin="5,0,0,0"
                        FontFamily="{StaticResource SegoueUIVariable}"
                        FontSize="15"
@@ -42,7 +42,7 @@
                          Grid.Row="1"
                          Grid.Column="0"
                          TextWrapping="Wrap"
-                         Foreground="White"
+                         Foreground="#243244"
                          IsEnabled="False" />
                 <Button x:Name="changeSearchDirectory"
                         Grid.Row="1"
@@ -56,7 +56,7 @@
                         Grid.Row="1"
                         Grid.Column="2"
                         Margin="14,0,0,0"
-                        Content="Search"
+                        Content="Scan / Cancel"
                         HorizontalAlignment="Right" />
 
 
@@ -88,7 +88,7 @@
                                      AutoGenerateColumns="False"
                                      RowStyle="{StaticResource DefaultDataGridRowStyle}"
                                      BorderThickness="0,0,0,0"
-                                     Foreground="White"
+                                     Foreground="#243244"
                                      SelectionMode="Single">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Source"
@@ -111,7 +111,7 @@
                         </ui:DataGrid>
                     </Border>
                     <Label Grid.Row="1"
-                           Content="Current Task:"
+                           Content="Scanning:"
                            Margin="5,0,0,0"
                            FontFamily="{StaticResource SegoueUIVariable}"
                            FontSize="15"
@@ -121,14 +121,14 @@
                              Grid.Row="2"
                              Margin="0,0,10,4"
                              TextWrapping="Wrap"
-                             Foreground="White"
+                             Foreground="#243244"
                              IsEnabled="False" />
                 </Grid>
 
                 <Button x:Name="DeleteLink"
                         Click="DeleteLink_Click"
                         Margin="0,0,0,5"
-                        Content="Delete"
+                        Content="Delete selected link"
                         Grid.Column="1"
                         VerticalAlignment="Bottom"
                         HorizontalAlignment="Right"
