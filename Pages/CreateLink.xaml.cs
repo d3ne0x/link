@@ -83,7 +83,7 @@ public partial class CreateLink : Page
         CreateLinkButton.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
         CreateLinkButton.IsEnabled = wizardStep == 4;
         if (wizardStep == 4)
-            ReviewText.Text = $"Link type: {SymbolicType.Text}\nTarget: {DestinationPath.Text}\nLink folder: {LinkFolderPath.Text}\nLink name: {LinkName.Text}";
+            ReviewText.Text = $"Link type: {SymbolicType.Text}\nTarget: {DestinationPath.Text}\nLink path: {Path.Combine(LinkFolderPath.Text, LinkName.Text)}\nLink name: {LinkName.Text}";
     }
     private void WizardBack_Click(object sender, RoutedEventArgs e)
     {
@@ -93,12 +93,12 @@ public partial class CreateLink : Page
     }
     private void WizardNext_Click(object sender, RoutedEventArgs e)
     {
-        if (wizardStep == 2 && !(File.Exists(DestinationPath.Text) || Directory.Exists(DestinationPath.Text)))
+        if (wizardStep == 2 && (linkFileType == "file" ? !File.Exists(DestinationPath.Text) : !Directory.Exists(DestinationPath.Text)))
         {
             ShowWizardError("Select an existing target file or folder.");
             return;
         }
-        if (wizardStep == 3 && (!Directory.Exists(LinkFolderPath.Text) || string.IsNullOrWhiteSpace(LinkName.Text)))
+        if (wizardStep == 3 && (!Directory.Exists(LinkFolderPath.Text) || string.IsNullOrWhiteSpace(LinkName.Text) || LinkName.Text != Path.GetFileName(LinkName.Text) || LinkName.Text is "." or ".." || LinkName.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || LinkName.Text.EndsWith(" ") || LinkName.Text.EndsWith(".")))
         {
             ShowWizardError("Choose an existing parent folder and enter a link name.");
             return;
@@ -119,6 +119,7 @@ public partial class CreateLink : Page
     public CreateLink()
     {
         InitializeComponent();
+        ShowWizardStep();
 
         if (!IsDeveloperModeEnabled() && !IsUserAdministrator()) {
             InfoBar.Severity = Wpf.Ui.Controls.InfoBarSeverity.Warning;
@@ -157,7 +158,7 @@ public partial class CreateLink : Page
     private void FileType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
 
-        if (DestinationPath == null || FileType.SelectedItem == null) { return; }
+        if (DestinationPath == null || FileType.SelectedItem == null || DestinationText == null || HardLink == null || JunctionLink == null || SymbolicType == null) { return; }
 
         var symbFileType = FileType.SelectedItem.ToString()?.Split(new string[] { ": " }, StringSplitOptions.None).Last();
 
@@ -238,8 +239,8 @@ public partial class CreateLink : Page
     {
         if (DestinationPath.Text != null)
         {
-            string fileName = Path.GetFileName(DestinationPath.Text);
-            LinkName.Text = Path.GetFileNameWithoutExtension(fileName);
+            string fileName = Path.GetFileName(Path.TrimEndingDirectorySeparator(DestinationPath.Text));
+            LinkName.Text = linkFileType == "file" ? fileName : fileName;
         }
     }
 
