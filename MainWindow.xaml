@@ -1,61 +1,27 @@
-﻿<ui:FluentWindow x:Class="Symbolic11.MainWindow"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:pages="clr-namespace:Symbolic11.Pages"
-                 Title="Symbolic11"
-                 Width="650"
-                 Height="420"
-                 MinWidth="650"
-                 MinHeight="420"
-                 mc:Ignorable="d"
-                 ExtendsContentIntoTitleBar="True"
-                 WindowBackdropType="Mica"
-                 WindowCornerPreference="Round"
-                 WindowStartupLocation="CenterScreen"
-                 Background="#FF202020">
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <ui:TitleBar x:Name="TitleBar"
-                     Title="Symbolic11"
-                     Grid.Row="0"
-                     Margin="0,0,0,-10">
-            <ui:TitleBar.Icon>
-                <ui:SymbolIcon Symbol="DocumentArrowRight20"
-                               FontSize="15"
-                               Foreground="White" />
-            </ui:TitleBar.Icon>
-        </ui:TitleBar>
-        <ui:NavigationView x:Name="RootNavigation"
-                           Grid.Row="1"
-                           PaneDisplayMode="LeftFluent"
-                           IsBackButtonVisible="Collapsed"
-                           Loaded="RootNavigation_Loaded">
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Create"
-                                       FontSize="9"
-                                       TargetPageType="{x:Type pages:CreateLink}"
-                                       NavigationCacheMode="Enabled">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Home24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="View"
-                                       FontSize="9"
-                                       TargetPageType="{x:Type pages:LinkView}"
-                                       NavigationCacheMode="Enabled">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="LinkSquare20" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-            </ui:NavigationView.MenuItems>
-
-        </ui:NavigationView>
-    </Grid>
-</ui:FluentWindow>
+<Window x:Class="Symbolic11.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="LinkCraft" Width="950" Height="620" MinWidth="760" MinHeight="480"
+ WindowStartupLocation="CenterScreen" Background="#F7F8FA" FontFamily="Segoe UI">
+ <Window.Resources>
+  <Style TargetType="Button">
+   <Setter Property="Padding" Value="16,10"/>
+   <Setter Property="Margin" Value="0,0,10,0"/>
+   <Setter Property="Cursor" Value="Hand"/>
+   <Setter Property="MinHeight" Value="38"/>
+  </Style>
+ </Window.Resources>
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Border Background="White" BorderBrush="#DCE2E9" BorderThickness="0,0,0,1" Padding="22,14">
+   <DockPanel>
+    <TextBlock Text="LinkCraft" FontSize="21" FontWeight="SemiBold" Foreground="#202B3A" VerticalAlignment="Center" Margin="0,0,30,0" DockPanel.Dock="Left"/>
+    <StackPanel Orientation="Horizontal">
+     <Button x:Name="CreateTab" Content="Create Link" Click="Create_Click"/>
+     <Button x:Name="ManageTab" Content="Existing Links" Click="Manage_Click"/>
+    </StackPanel>
+   </DockPanel>
+  </Border>
+  <Frame x:Name="Workspace" Grid.Row="1" NavigationUIVisibility="Hidden" Background="#F7F8FA"/>
+ </Grid>
+</Window>
