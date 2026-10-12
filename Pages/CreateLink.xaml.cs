@@ -69,6 +69,23 @@ public partial class CreateLink : Page
     }
 
 
+
+    private void SelectCard(int index)
+    {
+        if (index == 1) FileType.SelectedIndex = 1;
+        if (index == 2) FileType.SelectedIndex = 0;
+        SymbolicType.SelectedIndex = index;
+        SymbolicCard.BorderBrush = index == 0 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
+        HardCard.BorderBrush = index == 1 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
+        JunctionCard.BorderBrush = index == 2 ? System.Windows.Media.Brushes.DodgerBlue : System.Windows.Media.Brushes.LightGray;
+        SymbolicCard.Background = index == 0 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
+        HardCard.Background = index == 1 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
+        JunctionCard.Background = index == 2 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(234, 243, 255)) : System.Windows.Media.Brushes.White;
+    }
+    private void SymbolicCard_Click(object sender, RoutedEventArgs e) => SelectCard(0);
+    private void HardCard_Click(object sender, RoutedEventArgs e) => SelectCard(1);
+    private void JunctionCard_Click(object sender, RoutedEventArgs e) => SelectCard(2);
+
     private int wizardStep = 1;
     private void ShowWizardStep()
     {
@@ -78,6 +95,10 @@ public partial class CreateLink : Page
         StepFour.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
         string[] titles = { "Link type", "Target", "Link location", "Review & create" };
         StepCaption.Text = $"Step {wizardStep} of 4 — {titles[wizardStep - 1]}";
+        ProgressOne.FontWeight = wizardStep == 1 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressTwo.FontWeight = wizardStep == 2 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressThree.FontWeight = wizardStep == 3 ? FontWeights.Bold : FontWeights.Normal;
+        ProgressFour.FontWeight = wizardStep == 4 ? FontWeights.Bold : FontWeights.Normal;
         WizardBack.IsEnabled = wizardStep > 1;
         WizardNext.Visibility = wizardStep < 4 ? Visibility.Visible : Visibility.Collapsed;
         CreateLinkButton.Visibility = wizardStep == 4 ? Visibility.Visible : Visibility.Collapsed;
